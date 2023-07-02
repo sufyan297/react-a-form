@@ -1,5 +1,5 @@
 import React, { ChangeEvent, CSSProperties, FC, FocusEvent, useEffect, useState } from 'react';
-// import styles from './TextInput.module.css';
+import styles from './TextInput.module.css';
 interface ITextInput {
     type: 'text' | 'number' | 'email' | 'password' | 'url';
     name: string;
@@ -116,7 +116,7 @@ ${styles["text-input"]}
                         <i className={`${icon} ml-3 mt-4`} style={{ position: 'absolute' }} ></i>
                         <input
                             style={{ ...hasError ? { outline: '1px solid red' } : null, paddingLeft: '2%', ...containerStyle }}
-                            className={`hover:outline-primary active:outline-primary focus:outline-primary`}
+                            className={`${styles["text-input"]} hover:outline-primary active:outline-primary focus:outline-primary`}
                             type={type}
                             disabled={disabled}
                             id={name}
@@ -139,7 +139,7 @@ ${styles["text-input"]}
                     <div className='flex align-center justify-end'>
                         <input
                             style={{ ...hasError ? { outline: '1px solid red' } : null, paddingLeft: '2%' }}
-                            className={`hover:outline-primary active:outline-primary focus:outline-primary`}
+                            className={`${styles["text-input"]} hover:outline-primary active:outline-primary focus:outline-primary`}
                             type={type}
                             disabled={disabled}
                             id={name}
