@@ -1,0 +1,34 @@
+{
+  "name": "@ascendtis/react-a-form",
+  "version": "1.0.0",
+  "description": "Ascendtis own's Instant validation AForm component.",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/esm/index.d.ts",
+  "scripts": {
+    "build": "npm run build:esm && npm run build:cjs",
+    "build:esm": "tsc",
+    "build:cjs": "tsc --module commonjs --outDir dist/cjs"
+  },
+  "keywords": [
+    "react",
+    "typescript",
+    "form",
+    "validation"
+  ],
+  "author": "Ascendtis IT Solutions LLP",
+  "license": "ISC",
+  "peerDependencies": {
+    "react": ">=16"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.195",
+    "@types/react": "^18.2.14",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "typescript": "^5.1.6"
+  },
+  "dependencies": {
+    "lodash": "^4.17.21"
+  }
+}
