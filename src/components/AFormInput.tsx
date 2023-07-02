@@ -1,4 +1,4 @@
-import React, { CSSProperties, FC, forwardRef, Ref, useEffect, useImperativeHandle, useState } from 'react';
+import React, { CSSProperties, forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { uniq, get } from 'lodash';
 // import styles from './AFormInput.module.css';
 
@@ -66,9 +66,11 @@ interface IProps {
 
 // const AFormInput: FC<IProps> = ({ name, type, placeholder, hint, label, validation, validationName, defaultValue, handleChange }, ref) => {
 const AFormInput = forwardRef((props: IProps, ref) => {
-    const { name, type, model, query, searchField, containerBackground, containerTextColor, containerStyle, placeholder, hint, fileType, hasPreview, label, validation, validationName, defaultValue, handleChange, onValidate, options,
-        disabled, readOnly, multiple, rows, cols, inline, extraitem, labelPosition, autocomplete, hasError, inputClassName, removeElement, buttonTheme, buttonLoading, onChange,
-        minDate, maxDate, maskPlaceholder, maskFormat, mimeAccept, onBlur } = props;
+    //model, query, searchField, containerBackground, containerTextColor, fileType, hasPreview,multiple, rows, cols, inline, extraitem, labelPosition,
+    //options,minDate, maxDate, mimeAccept,hasError, inputClassName,buttonTheme, buttonLoading, 
+    const { name, type, containerStyle, placeholder, hint, label, validation, validationName, defaultValue, handleChange, onValidate, 
+        disabled, readOnly, autocomplete,  removeElement, onChange,
+        maskPlaceholder, maskFormat,  onBlur } = props;
     // States
     const [value, setValue] = useState<any>(defaultValue); //string | undefined - defaultValue : undefined
     const [errors, setErrors] = useState<string[]>([]);
