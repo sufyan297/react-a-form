@@ -1,5 +1,4 @@
 import React, { ChangeEvent, CSSProperties, FC, FocusEvent, useEffect, useState } from 'react';
-import styles from './TextInput.module.css';
 interface ITextInput {
     type: 'text' | 'number' | 'email' | 'password' | 'url';
     name: string;
@@ -12,14 +11,14 @@ interface ITextInput {
     maxlength?: number;
     defaultValue?: string;
     hasError: boolean;
-    iconPosition?: "prefix" | "postfix";
+    // iconPosition?: "prefix" | "postfix";
     icon?: string;
     containerStyle?: CSSProperties;
     maskPlaceholder?: string;
     maskFormat?: string;
 }
 
-const TextInput: FC<ITextInput> = ({ type, disabled, name, containerStyle, placeholder, maskPlaceholder,  maskFormat, readonly, onBlur, onChange, autocomplete, defaultValue, maxlength, hasError, icon, iconPosition }) => {
+const TextInput: FC<ITextInput> = ({ type, disabled, name, placeholder, maskPlaceholder, containerStyle, maskFormat, readonly, onBlur, onChange, autocomplete, defaultValue, maxlength, hasError, icon }) => {
 
     //States
     const [ iPlaceholder, setIPlaceholder] = useState(placeholder);
@@ -111,35 +110,35 @@ ${styles["text-input"]}
     return (
         <div>
             {
-                iconPosition == 'prefix' ?
-                    <div className='flex align-center'>
-                        <i className={`${icon} ml-3 mt-4`} style={{ position: 'absolute' }} ></i>
+                // iconPosition == 'prefix' ?
+                    // <div className='flex align-center'>
+                    //     <i className={`${icon} ml-3 mt-4`} style={{ position: 'absolute' }} ></i>
+                    //     <input
+                    //         style={{ ...hasError ? { outline: '1px solid red' } : null, paddingLeft: '2%', ...containerStyle }}
+                    //         className={`${styles["text-input"]} hover:outline-primary active:outline-primary focus:outline-primary`}
+                    //         type={type}
+                    //         disabled={disabled}
+                    //         id={name}
+                    //         name={name}
+                    //         placeholder={iPlaceholder}
+                    //         readOnly={readonly}
+                    //         onChange={handleChange}
+                    //         defaultValue={defaultValue}
+                    //         value={maskPlaceholder && maskFormat ? iValue : undefined}
+                    //         maxLength={maxlength}
+                    //         onBlur={handleBlur}
+                    //         autoComplete={autocomplete === false ? 'new-password' : ''}
+                    //         onMouseOver={onMouseOver}
+                    //         onMouseOut={onMouseOut}
+                    //         onKeyUp={(e) => maskPlaceholder && maskFormat ? doValueMasking(e) : null}
+                    //         onKeyDown={(e) => maskPlaceholder && maskFormat ? doValueMasking(e) : null}
+                    //     />
+                    // </div>
+                    // :
+                    <div className={`flex rounded-md shadow-sm ring-1 ring-inset focus-within:ring-2 focus-within:ring-inset ${hasError ? 'ring-red-700 focus-within:ring-red-700' : 'ring-gray-300 focus-within:ring-primary'} sm:max-w-md`}>
                         <input
-                            style={{ ...hasError ? { outline: '1px solid red' } : null, paddingLeft: '2%', ...containerStyle }}
-                            className={`${styles["text-input"]} hover:outline-primary active:outline-primary focus:outline-primary`}
-                            type={type}
-                            disabled={disabled}
-                            id={name}
-                            name={name}
-                            placeholder={iPlaceholder}
-                            readOnly={readonly}
-                            onChange={handleChange}
-                            defaultValue={defaultValue}
-                            value={maskPlaceholder && maskFormat ? iValue : undefined}
-                            maxLength={maxlength}
-                            onBlur={handleBlur}
-                            autoComplete={autocomplete === false ? 'new-password' : ''}
-                            onMouseOver={onMouseOver}
-                            onMouseOut={onMouseOut}
-                            onKeyUp={(e) => maskPlaceholder && maskFormat ? doValueMasking(e) : null}
-                            onKeyDown={(e) => maskPlaceholder && maskFormat ? doValueMasking(e) : null}
-                        />
-                    </div>
-                    :
-                    <div className='flex align-center justify-end'>
-                        <input
-                            style={{ ...hasError ? { outline: '1px solid red' } : null, paddingLeft: '2%' }}
-                            className={`${styles["text-input"]} hover:outline-primary active:outline-primary focus:outline-primary`}
+                            style={{ ...containerStyle }}
+                            className={`focus:outline-none block flex-1 border-0 bg-transparent py-1.5 pl-3 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6`}
                             type={type}
                             disabled={disabled}
                             id={name}
@@ -158,7 +157,7 @@ ${styles["text-input"]}
                             onKeyDown={(e) => maskPlaceholder && maskFormat ? doValueMasking(e) : null}
                         />
                         <i className={`${icon} mr-3 mt-4`} style={{ position: 'absolute' }} ></i>
-                    </ div>
+                    </div>
             }
         </div>
     )

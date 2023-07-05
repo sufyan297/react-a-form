@@ -24,6 +24,7 @@
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
     "resolveJsonModule": true,
+    "allowJs": true,
     "plugins": [{ "name": "typescript-plugin-css-modules" }]
   }
 }
