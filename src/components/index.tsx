@@ -1,4 +1,3 @@
-'use client';
 import React, { FC, isValidElement, useEffect, useState, FormEvent } from 'react';
 import { get, map } from 'lodash';
 
