@@ -18,6 +18,7 @@
   ],
   "author": "Ascendtis IT Solutions LLP",
   "license": "ISC",
+  "private": false,
   "peerDependencies": {
     "react": ">=16"
   },
