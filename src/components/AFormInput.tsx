@@ -1,5 +1,5 @@
 import React, { CSSProperties, forwardRef, useEffect, useImperativeHandle, useState } from 'react';
-import { uniq, get, map } from 'lodash';
+import { map } from 'lodash';
 
 //Input components
 import TextInput from './inputs/TextInput';
