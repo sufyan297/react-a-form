@@ -11,10 +11,15 @@ interface IProps {
     placeholder?: string;
     type: 'text' | 'number' | 'password' | 'url' | 'email' | 'checkbox';
     validation: IValidations;
+    validationName?: string;
     defaultValue?: string;
     disabled?: boolean;
     readOnly?: boolean;
     autocomplete?: boolean;
+
+    //Syles
+    containerStyle?: CSSProperties;
+    inputStyle?: CSSProperties;
 
     //@IMPORTANT Events
     onValidate?: (name: string, errors: string[]) => void;
@@ -27,8 +32,8 @@ interface IProps {
 
 const AFormInput = forwardRef((props: IProps, ref) => {
     //Props
-    const { name, type, validation, label, placeholder, defaultValue, disabled, readOnly, autocomplete,
-        onValidate, removeElement, handleChange, onChange, onBlur } = props;
+    const { name, type, validation, validationName, label, placeholder, defaultValue, disabled, readOnly, autocomplete,
+        onValidate, removeElement, handleChange, onChange, onBlur, containerStyle, inputStyle } = props;
 
     //States
     const [value, setValue] = useState<any>(defaultValue); //string | undefined - defaultValue : undefined
@@ -79,10 +84,10 @@ const AFormInput = forwardRef((props: IProps, ref) => {
         let errors: string[] = [];
         validation && map(validation,(value: any, rule: string) => {
         //     const newRule = rule ? rule.split(':') : [];
-        //     let tmpError: string[] = [];
-        //     switch (get(newRule, '[0]', rule)) {
-        //         case 'required': tmpError = isRequired(); break;
-        //         case 'email': tmpError = isEmail(); break;
+            let tmpError: string[] = [];
+            switch (rule) {
+                case 'required': value === true ? tmpError = isRequired() : undefined; break;
+                case 'email': value === true ? tmpError = isEmail() : undefined; break;
         //         case 'strong_password': tmpError = isStrongPassword(); break;
         //         case 'ifsc': tmpError = isIfsc(); break;
         //         case 'number': tmpError = isNumber(); break;
@@ -91,10 +96,33 @@ const AFormInput = forwardRef((props: IProps, ref) => {
         //         case 'between': tmpError = isBetween(newRule[1]); break;
         //         case 'url': tmpError = isUrl(); break;
         //         case 'mime': tmpError = hasMime(newRule[1]); break;
-        //     }
-        //     errors = [...errors, ...tmpError];
+            }
+            errors = [...errors, ...tmpError];
         });
         setErrors(errors);
+    }
+
+    //RULES - VALIDATIONS FUNCTIONS
+    const isRequired = () => { //Input is required?
+        const errors: string[] = [];
+        if (!value || (value && typeof value == 'string' && value.trim() == '')) {
+            errors.push((validationName || name) + ' is required');
+        }
+        if (Array.isArray(value) && value.length === 0) {
+            errors.push((validationName || name) + ' is required');
+        }
+        return errors;
+    }
+    const isEmail = () => {
+        const errors: string[] = [];
+        const regEx = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        if (!value && !hasRequired()) return errors;
+        if (!value) {
+            errors.push('Please enter a valid email address.');
+        } else if (!regEx.test(value)) {
+            errors.push('"' + value + '" is not a valid email address.');
+        }
+        return errors;
     }
 
     //HELPER FUNCTIONS
@@ -124,7 +152,8 @@ const AFormInput = forwardRef((props: IProps, ref) => {
                     placeholder={placeholder}
                     disabled={disabled}
                     readonly={readOnly}
-                    // containerStyle={containerStyle}
+                    containerStyle={containerStyle}
+                    inputStyle={inputStyle}
                     // maskPlaceholder={maskPlaceholder}
                     // maskFormat={maskFormat}
                     autocomplete={autocomplete}
