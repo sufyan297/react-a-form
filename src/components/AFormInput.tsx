@@ -10,7 +10,7 @@ interface IProps {
     label?: string;
     placeholder?: string;
     type: 'text' | 'number' | 'password' | 'url' | 'email' | 'checkbox';
-    validation: IValidations;
+    validation?: IValidations;
     validationName?: string;
     defaultValue?: string;
     disabled?: boolean;
