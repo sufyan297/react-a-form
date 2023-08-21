@@ -16,6 +16,7 @@ interface IProps {
     disabled?: boolean;
     readOnly?: boolean;
     autocomplete?: boolean;
+    hint?: string;
 
     //Syles
     containerStyle?: CSSProperties;
@@ -33,7 +34,7 @@ interface IProps {
 const AFormInput = forwardRef((props: IProps, ref) => {
     //Props
     const { name, type, validation, validationName, label, placeholder, defaultValue, disabled, readOnly, autocomplete,
-        onValidate, removeElement, handleChange, onChange, onBlur, containerStyle, inputStyle } = props;
+        onValidate, removeElement, handleChange, onChange, onBlur, containerStyle, inputStyle, hint } = props;
 
     //States
     const [value, setValue] = useState<any>(defaultValue); //string | undefined - defaultValue : undefined
@@ -159,6 +160,20 @@ const AFormInput = forwardRef((props: IProps, ref) => {
                     autocomplete={autocomplete}
                 />
             : null
+        }
+        {
+            hint ? <span className="text-gray text-sm" style={{ color: '#a9a9a9' }}>{hint}</span> : null
+        }
+        {
+            errors && errors.length > 0 ?
+                <div className="text-red-700">
+                    {
+                        errors.map((error, idx) => (
+                            <p key={name + idx} style={{ marginBottom: '2px', marginTop: 0 }} className='text-sm'>{error}</p>
+                        ))
+                    }
+                </div>
+                : null
         }
         </div>
     )
