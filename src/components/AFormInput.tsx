@@ -4,12 +4,13 @@ import { map } from 'lodash';
 //Input components
 import TextInput from './inputs/TextInput';
 import { IValidations } from '../types';
+import ToggleSwitch from './inputs/ToggleSwitch';
 
 interface IProps {
     name: string;
     label?: string;
     placeholder?: string;
-    type: 'text' | 'number' | 'password' | 'url' | 'email' | 'checkbox';
+    type: 'text' | 'number' | 'password' | 'url' | 'email' | 'checkbox' | 'toggle';
     validation?: IValidations;
     validationName?: string;
     defaultValue?: string;
@@ -139,7 +140,7 @@ const AFormInput = forwardRef((props: IProps, ref) => {
     return (
         <div>
         {
-            label && typeof label == 'string' && type != 'checkbox' ?
+            label && typeof label == 'string' && !['checkbox', 'toggle'].includes(type) ?
                 <label htmlFor={name} className={'block text-sm font-medium leading-6 text-gray-800 mb-1.5'}>{label}{hasRequired() ? <span className='text-red-700 text-xs'>*</span> : null}</label>
                 : null
         }
@@ -162,6 +163,14 @@ const AFormInput = forwardRef((props: IProps, ref) => {
                     // maskPlaceholder={maskPlaceholder}
                     // maskFormat={maskFormat}
                     autocomplete={autocomplete}
+                />
+            : type == 'toggle' ?
+                <ToggleSwitch
+                    name={name}
+                    label={label}
+                    onChange={() => onInputChange(!value)}
+                    defaultValue={value}
+                    containerClassName={containerClassName}
                 />
             : null
         }

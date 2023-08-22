@@ -10,7 +10,7 @@ interface IProps {
     formLoading?: boolean;
 }
 
-const types = ['text', 'password', 'number', 'date', 'time', 'datetime', 'email', 'url', 'textarea', 'file', 'image', 'radio', 'checkbox', 'select', 'submit', 'createable-select', 'date-range', 'rich-text-editor'];
+const types = ['text', 'password', 'number', 'date', 'time', 'datetime', 'email', 'url', 'textarea', 'file', 'image', 'radio', 'checkbox', 'select', 'submit', 'createable-select', 'date-range', 'rich-text-editor', 'toggle'];
 const AForm: FC<IProps> = ({ name, children, values, onSubmit, className, formLoading = false }) => {
 
     //States
