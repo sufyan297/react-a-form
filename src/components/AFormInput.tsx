@@ -21,6 +21,8 @@ interface IProps {
     //Syles
     containerStyle?: CSSProperties;
     inputStyle?: CSSProperties;
+    containerClassName?: string;
+    inputClassName?: string;
 
     //@IMPORTANT Events
     onValidate?: (name: string, errors: string[]) => void;
@@ -34,7 +36,7 @@ interface IProps {
 const AFormInput = forwardRef((props: IProps, ref) => {
     //Props
     const { name, type, validation, validationName, label, placeholder, defaultValue, disabled, readOnly, autocomplete,
-        onValidate, removeElement, handleChange, onChange, onBlur, containerStyle, inputStyle, hint } = props;
+        onValidate, removeElement, handleChange, onChange, onBlur, containerStyle, inputStyle, hint, containerClassName, inputClassName } = props;
 
     //States
     const [value, setValue] = useState<any>(defaultValue); //string | undefined - defaultValue : undefined
@@ -155,6 +157,8 @@ const AFormInput = forwardRef((props: IProps, ref) => {
                     readonly={readOnly}
                     containerStyle={containerStyle}
                     inputStyle={inputStyle}
+                    containerClassName={containerClassName}
+                    inputClassName={inputClassName}
                     // maskPlaceholder={maskPlaceholder}
                     // maskFormat={maskFormat}
                     autocomplete={autocomplete}
