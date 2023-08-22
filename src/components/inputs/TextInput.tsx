@@ -15,11 +15,13 @@ interface ITextInput {
     icon?: string;
     containerStyle?: CSSProperties;
     inputStyle?: CSSProperties;
+    containerClassName?: string;
+    inputClassName?: string;
     maskPlaceholder?: string;
     maskFormat?: string;
 }
 
-const TextInput: FC<ITextInput> = ({ type, disabled, name, placeholder, maskPlaceholder, containerStyle, inputStyle, maskFormat, readonly, onBlur, onChange, autocomplete, defaultValue, maxlength, hasError, icon }) => {
+const TextInput: FC<ITextInput> = ({ type, disabled, name, placeholder, maskPlaceholder, containerStyle, inputStyle, maskFormat, readonly, onBlur, onChange, autocomplete, defaultValue, maxlength, hasError, icon, containerClassName,inputClassName }) => {
 
     //States
     const [ iPlaceholder, setIPlaceholder] = useState(placeholder);
@@ -136,10 +138,10 @@ ${styles["text-input"]}
                     //     />
                     // </div>
                     // :
-                    <div style={{ ...containerStyle }} className={`flex rounded-md shadow-sm ring-1 ring-inset focus-within:ring-2 focus-within:ring-inset ${hasError ? 'ring-red-700 focus-within:ring-red-700' : 'ring-gray-300 hover:ring-primary focus-within:ring-primary'} sm:max-w-md`}>
+                    <div style={{ ...containerStyle }} className={`flex rounded-md shadow-sm ring-1 ring-inset focus-within:ring-2 focus-within:ring-inset ${hasError ? 'ring-red-700 focus-within:ring-red-700' : 'ring-gray-300 hover:ring-primary focus-within:ring-primary'} sm:max-w-md ${containerClassName}`}>
                         <input
                             style={{ ...inputStyle }}
-                            className={`focus:outline-none block flex-1 border-0 bg-transparent py-1.5 pl-3 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6`}
+                            className={`focus:outline-none block flex-1 border-0 bg-transparent py-1.5 pl-3 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6 ${inputClassName}`}
                             type={type}
                             disabled={disabled}
                             id={name}
