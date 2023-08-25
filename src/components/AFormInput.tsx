@@ -5,6 +5,7 @@ import { map } from 'lodash';
 import TextInput from './inputs/TextInput';
 import { IValidations } from '../types';
 import ToggleSwitch from './inputs/ToggleSwitch';
+import Checkbox from './inputs/Checkbox';
 
 interface IProps {
     name: string;
@@ -77,7 +78,7 @@ const AFormInput = forwardRef((props: IProps, ref) => {
         handleChange ? handleChange(name, value) : null;
         onChange ? onChange(value) : null;
     }
-    const onInputBlur = (value?: string) => {
+    const onInputBlur = (value?: string | string[] | boolean) => {
         onValidation();
         onBlur ? onBlur(value) : null;
     }
@@ -166,6 +167,14 @@ const AFormInput = forwardRef((props: IProps, ref) => {
                 />
             : type == 'toggle' ?
                 <ToggleSwitch
+                    name={name}
+                    label={label}
+                    onChange={() => onInputChange(!value)}
+                    defaultValue={value}
+                    containerClassName={containerClassName}
+                />
+            : type == 'checkbox' ?
+                <Checkbox
                     name={name}
                     label={label}
                     onChange={() => onInputChange(!value)}
