@@ -3,7 +3,7 @@ interface IProps {
     onChange: () => void;
     containerClassName?: string;
     defaultValue?: boolean;
-    label?: string;
+    label?: string | React.ReactNode;
     name: string;
 }
 const ToggleSwitch: FC<IProps> = ({ onChange, containerClassName, defaultValue, label, name }) => {

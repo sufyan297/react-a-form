@@ -9,7 +9,7 @@ import Checkbox from './inputs/Checkbox';
 
 interface IProps {
     name: string;
-    label?: string;
+    label?: string | React.ReactNode;
     placeholder?: string;
     type: 'text' | 'number' | 'password' | 'url' | 'email' | 'checkbox' | 'toggle';
     validation?: IValidations;

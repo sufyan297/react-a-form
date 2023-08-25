@@ -4,7 +4,7 @@ interface IProps {
     containerClassName?: string;
     inputClassName?: string;
     defaultValue?: boolean;
-    label?: string;
+    label?: string | React.ReactNode;
     name: string;
     disabled?: boolean;
 }
