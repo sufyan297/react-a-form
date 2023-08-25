@@ -14,6 +14,7 @@ Ascendtis own's Instant validation AForm component.
 ![sample form](https://raw.githubusercontent.com/sufyan297/react-a-form/main/samples/sample1.png)
 
    
+	import { AButton, AForm, AFormInput } from '@ascendtis/react-a-form'
 
     <AForm
 	    onSubmit={(values) => console.log("Form Values:", values)}
