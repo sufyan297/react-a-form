@@ -11,7 +11,7 @@ Ascendtis own's Instant validation AForm component.
   
 
 ## Example
-![sample form](./samples/sample1.png)
+![sample form](https://raw.githubusercontent.com/sufyan297/react-a-form/main/samples/sample1.png)
 
    
 
