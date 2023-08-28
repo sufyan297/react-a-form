@@ -3,15 +3,16 @@ import { map } from 'lodash';
 
 //Input components
 import TextInput from './inputs/TextInput';
-import { IValidations } from '../types';
+import { ISelect, IValidations } from '../types';
 import ToggleSwitch from './inputs/ToggleSwitch';
 import Checkbox from './inputs/Checkbox';
+import ComboBox from './inputs/ComboBox';
 
 interface IProps {
     name: string;
     label?: string | React.ReactNode;
     placeholder?: string;
-    type: 'text' | 'number' | 'password' | 'url' | 'email' | 'checkbox' | 'toggle';
+    type: 'text' | 'number' | 'password' | 'url' | 'email' | 'checkbox' | 'toggle' | 'select';
     validation?: IValidations;
     validationName?: string;
     defaultValue?: string;
@@ -19,6 +20,11 @@ interface IProps {
     readOnly?: boolean;
     autocomplete?: boolean;
     hint?: string;
+
+    //ComboBox / Select
+    options?: ISelect[];
+    multiple?: boolean;
+    loading?: boolean;
 
     //Syles
     containerStyle?: CSSProperties;
@@ -38,7 +44,7 @@ interface IProps {
 const AFormInput = forwardRef((props: IProps, ref) => {
     //Props
     const { name, type, validation, validationName, label, placeholder, defaultValue, disabled, readOnly, autocomplete,
-        onValidate, removeElement, handleChange, onChange, onBlur, containerStyle, inputStyle, hint, containerClassName, inputClassName } = props;
+        onValidate, removeElement, handleChange, onChange, onBlur, containerStyle, inputStyle, hint, containerClassName, inputClassName, multiple, loading, options } = props;
 
     //States
     const [value, setValue] = useState<any>(defaultValue); //string | undefined - defaultValue : undefined
@@ -180,6 +186,22 @@ const AFormInput = forwardRef((props: IProps, ref) => {
                     onChange={() => onInputChange(!value)}
                     defaultValue={value}
                     containerClassName={containerClassName}
+                    disabled={disabled}
+                    inputClassName={inputClassName}
+                />
+            : type == 'select' && options ?
+                <ComboBox
+                    name={name}
+                    hasError={errors && errors.length > 0 ? true : false}
+                    options={options}
+                    defaultValue={defaultValue}
+                    disabled={disabled}
+                    containerStyle={containerStyle}
+                    inputStyle={inputStyle}
+                    multiple={multiple}
+                    loading={loading}
+                    onChange={(value) => onInputChange(value)}
+                    placeholder={placeholder}
                 />
             : null
         }
