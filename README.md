@@ -48,6 +48,8 @@ Ascendtis own's Instant validation AForm component.
 ## Available FormInputs
 - TextInput
 - Checkbox
+- Select
+- File Input (Drag and Drop)
 - Toggle Switch
 - Action Button
 
@@ -56,3 +58,4 @@ Ascendtis own's Instant validation AForm component.
 ## Validations
 - Required
 - Email
+- Number
