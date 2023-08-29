@@ -19,3 +19,11 @@ export interface IValidations {
   between?: string[];
   url?: boolean;
 }
+
+export interface IFile {
+  file: File;
+  name: string;
+  url: string;
+  type: string;
+  hasPreview: boolean;
+}

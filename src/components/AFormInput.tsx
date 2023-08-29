@@ -3,16 +3,17 @@ import { map } from 'lodash';
 
 //Input components
 import TextInput from './inputs/TextInput';
-import { ISelect, IValidations } from '../types';
+import { IFile, ISelect, IValidations } from '../types';
 import ToggleSwitch from './inputs/ToggleSwitch';
 import Checkbox from './inputs/Checkbox';
 import ComboBox from './inputs/ComboBox';
+import FileInput from './inputs/FileInput';
 
 interface IProps {
     name: string;
     label?: string | React.ReactNode;
     placeholder?: string;
-    type: 'text' | 'number' | 'password' | 'url' | 'email' | 'checkbox' | 'toggle' | 'select';
+    type: 'text' | 'number' | 'password' | 'url' | 'email' | 'checkbox' | 'toggle' | 'select' | 'file' | 'image';
     validation?: IValidations;
     validationName?: string;
     defaultValue?: string;
@@ -20,6 +21,9 @@ interface IProps {
     readOnly?: boolean;
     autocomplete?: boolean;
     hint?: string;
+
+    //File
+    acceptMime?: string;
 
     //ComboBox / Select
     options?: ISelect[];
@@ -34,7 +38,7 @@ interface IProps {
 
     //@IMPORTANT Events
     onValidate?: (name: string, errors: string[]) => void;
-    handleChange?: (name: string, value: string | string[] | boolean) => void;
+    handleChange?: (name: string, value: string | string[] | boolean | IFile[]) => void;
     removeElement?: (name: string) => void;
 
     onChange?: (value: any) => void;
@@ -43,7 +47,7 @@ interface IProps {
 
 const AFormInput = forwardRef((props: IProps, ref) => {
     //Props
-    const { name, type, validation, validationName, label, placeholder, defaultValue, disabled, readOnly, autocomplete,
+    const { name, type, validation, validationName, label, placeholder, defaultValue, disabled, readOnly, autocomplete, acceptMime,
         onValidate, removeElement, handleChange, onChange, onBlur, containerStyle, inputStyle, hint, containerClassName, inputClassName, multiple, loading, options } = props;
 
     //States
@@ -79,12 +83,12 @@ const AFormInput = forwardRef((props: IProps, ref) => {
     )
 
     //@Methods
-    const onInputChange = (value: string | string[] | boolean) => {
+    const onInputChange = (value: string | string[] | boolean | IFile[]) => {
         setValue(value);
         handleChange ? handleChange(name, value) : null;
         onChange ? onChange(value) : null;
     }
-    const onInputBlur = (value?: string | string[] | boolean) => {
+    const onInputBlur = (value?: string | string[] | boolean | IFile[]) => {
         onValidation();
         onBlur ? onBlur(value) : null;
     }
@@ -101,7 +105,7 @@ const AFormInput = forwardRef((props: IProps, ref) => {
                 case 'email': value === true ? tmpError = isEmail() : undefined; break;
         //         case 'strong_password': tmpError = isStrongPassword(); break;
         //         case 'ifsc': tmpError = isIfsc(); break;
-        //         case 'number': tmpError = isNumber(); break;
+                case 'number': value === true ? tmpError = isNumber() : undefined; break;
         //         case 'min': tmpError = isMin(newRule[1]); break;
         //         case 'max': tmpError = isMax(newRule[1]); break;
         //         case 'between': tmpError = isBetween(newRule[1]); break;
@@ -135,7 +139,13 @@ const AFormInput = forwardRef((props: IProps, ref) => {
         }
         return errors;
     }
-
+    const isNumber = () => {
+        const errors: string[] = [];
+        if (value && isNaN(Number(value))) {
+            errors.push((validationName || name) + ' must be a number.');
+        }
+        return errors;
+    }
     //HELPER FUNCTIONS
     const hasRequired = () => {
         if (validation && validation.required && validation.required == true) {
@@ -202,6 +212,14 @@ const AFormInput = forwardRef((props: IProps, ref) => {
                     loading={loading}
                     onChange={(value) => onInputChange(value)}
                     placeholder={placeholder}
+                />
+            : type == 'file' || type == 'image' ?
+                <FileInput
+                    name={name}
+                    type={type}
+                    multiple={multiple}
+                    accept={type === 'image' ? 'image/*' : acceptMime}
+                    onChange={(files) => onInputChange(files)}
                 />
             : null
         }
