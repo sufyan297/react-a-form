@@ -8,12 +8,13 @@ import ToggleSwitch from './inputs/ToggleSwitch';
 import Checkbox from './inputs/Checkbox';
 import ComboBox from './inputs/ComboBox';
 import FileInput from './inputs/FileInput';
+import TextArea from './inputs/TextArea';
 
 interface IProps {
     name: string;
     label?: string | React.ReactNode;
     placeholder?: string;
-    type: 'text' | 'number' | 'password' | 'url' | 'email' | 'checkbox' | 'toggle' | 'select' | 'file' | 'image';
+    type: 'text' | 'number' | 'password' | 'url' | 'email' | 'checkbox' | 'toggle' | 'select' | 'file' | 'image' | 'textarea';
     validation?: IValidations;
     validationName?: string;
     defaultValue?: string;
@@ -220,6 +221,20 @@ const AFormInput = forwardRef((props: IProps, ref) => {
                     multiple={multiple}
                     accept={type === 'image' ? 'image/*' : acceptMime}
                     onChange={(files) => onInputChange(files)}
+                />
+            : type == 'textarea' ?
+                <TextArea
+                    name={name}
+                    hasError={errors && errors.length > 0 ? true : false}
+                    onChange={(value) => onInputChange(value)}
+                    defaultValue={defaultValue}
+                    placeholder={placeholder}
+                    disabled={disabled}
+                    readonly={readOnly}
+                    containerStyle={containerStyle}
+                    inputStyle={inputStyle}
+                    containerClassName={containerClassName}
+                    inputClassName={inputClassName}
                 />
             : null
         }

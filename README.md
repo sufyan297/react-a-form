@@ -52,6 +52,7 @@ Ascendtis own's Instant validation AForm component.
 - File Input (Drag and Drop)
 - Toggle Switch
 - Action Button
+- TextArea
 
   
 
