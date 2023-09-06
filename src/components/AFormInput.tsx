@@ -15,7 +15,7 @@ interface IProps {
     name: string;
     label?: string | React.ReactNode;
     placeholder?: string;
-    type: 'text' | 'number' | 'password' | 'url' | 'email' | 'checkbox' | 'toggle' | 'select' | 'file' | 'image' | 'textarea' | 'date';
+    type: 'text' | 'number' | 'password' | 'url' | 'email' | 'checkbox' | 'toggle' | 'select' | 'file' | 'image' | 'textarea' | 'date' | 'datetime' | 'time';
     validation?: IValidations;
     validationName?: string;
     defaultValue?: string;
@@ -241,8 +241,9 @@ const AFormInput = forwardRef((props: IProps, ref) => {
                     containerClassName={containerClassName}
                     inputClassName={inputClassName}
                 />
-            : type == 'date' ?
+            : type == 'date' || type == 'datetime' || type == 'time' ?
                 <DatePicker
+                    type={type}
                     name={name}
                     hasError={errors && errors.length > 0 ? true : false}
                     onChange={(value) => onInputChange(value)}
