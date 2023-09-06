@@ -9,12 +9,13 @@ import Checkbox from './inputs/Checkbox';
 import ComboBox from './inputs/ComboBox';
 import FileInput from './inputs/FileInput';
 import TextArea from './inputs/TextArea';
+import DatePicker from './inputs/DatePicker';
 
 interface IProps {
     name: string;
     label?: string | React.ReactNode;
     placeholder?: string;
-    type: 'text' | 'number' | 'password' | 'url' | 'email' | 'checkbox' | 'toggle' | 'select' | 'file' | 'image' | 'textarea';
+    type: 'text' | 'number' | 'password' | 'url' | 'email' | 'checkbox' | 'toggle' | 'select' | 'file' | 'image' | 'textarea' | 'date';
     validation?: IValidations;
     validationName?: string;
     defaultValue?: string;
@@ -44,12 +45,16 @@ interface IProps {
 
     onChange?: (value: any) => void;
     onBlur?: (value: any) => void;
+
+    //Date
+    minDate?: string;
+    maxDate?: string;
 }
 
 const AFormInput = forwardRef((props: IProps, ref) => {
     //Props
     const { name, type, validation, validationName, label, placeholder, defaultValue, disabled, readOnly, autocomplete, acceptMime,
-        onValidate, removeElement, handleChange, onChange, onBlur, containerStyle, inputStyle, hint, containerClassName, inputClassName, multiple, loading, options } = props;
+        onValidate, removeElement, handleChange, onChange, onBlur, containerStyle, inputStyle, hint, containerClassName, inputClassName, multiple, loading, options, minDate, maxDate } = props;
 
     //States
     const [value, setValue] = useState<any>(defaultValue); //string | undefined - defaultValue : undefined
@@ -235,6 +240,17 @@ const AFormInput = forwardRef((props: IProps, ref) => {
                     inputStyle={inputStyle}
                     containerClassName={containerClassName}
                     inputClassName={inputClassName}
+                />
+            : type == 'date' ?
+                <DatePicker
+                    name={name}
+                    hasError={errors && errors.length > 0 ? true : false}
+                    onChange={(value) => onInputChange(value)}
+                    defaultValue={defaultValue}
+                    disabled={disabled}
+                    readonly={readOnly}
+                    minDate={minDate}
+                    maxDate={maxDate}
                 />
             : null
         }

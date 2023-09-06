@@ -113,31 +113,6 @@ ${styles["text-input"]}
     return (
         <div>
             {
-                // iconPosition == 'prefix' ?
-                    // <div className='flex align-center'>
-                    //     <i className={`${icon} ml-3 mt-4`} style={{ position: 'absolute' }} ></i>
-                    //     <input
-                    //         style={{ ...hasError ? { outline: '1px solid red' } : null, paddingLeft: '2%', ...containerStyle }}
-                    //         className={`${styles["text-input"]} hover:outline-primary active:outline-primary focus:outline-primary`}
-                    //         type={type}
-                    //         disabled={disabled}
-                    //         id={name}
-                    //         name={name}
-                    //         placeholder={iPlaceholder}
-                    //         readOnly={readonly}
-                    //         onChange={handleChange}
-                    //         defaultValue={defaultValue}
-                    //         value={maskPlaceholder && maskFormat ? iValue : undefined}
-                    //         maxLength={maxlength}
-                    //         onBlur={handleBlur}
-                    //         autoComplete={autocomplete === false ? 'new-password' : ''}
-                    //         onMouseOver={onMouseOver}
-                    //         onMouseOut={onMouseOut}
-                    //         onKeyUp={(e) => maskPlaceholder && maskFormat ? doValueMasking(e) : null}
-                    //         onKeyDown={(e) => maskPlaceholder && maskFormat ? doValueMasking(e) : null}
-                    //     />
-                    // </div>
-                    // :
                     <div style={{ ...containerStyle }} className={`flex rounded-md shadow-sm ring-1 ring-inset focus-within:ring-2 focus-within:ring-inset ${hasError ? 'ring-red-700 focus-within:ring-red-700' : 'ring-gray-300 hover:ring-primary focus-within:ring-primary'} sm:max-w-md ${containerClassName}`}>
                         <input
                             style={{ ...inputStyle }}
