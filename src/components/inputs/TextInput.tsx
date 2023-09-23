@@ -10,7 +10,7 @@ interface ITextInput {
     autocomplete?: boolean;
     maxlength?: number;
     defaultValue?: string;
-    hasError: boolean;
+    hasError?: boolean;
     // iconPosition?: "prefix" | "postfix";
     icon?: string;
     containerStyle?: CSSProperties;
