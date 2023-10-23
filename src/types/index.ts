@@ -11,8 +11,10 @@ export interface ISelect {
 }
 export interface IValidations {
   required?: boolean;
-  min?: number;
-  max?: number;
+  minValue?: number;
+  maxValue?: number;
+  minLength?: number;
+  maxLength?: number;
   email?: boolean;
   number?: boolean;
   mime?: string;

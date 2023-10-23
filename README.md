@@ -60,3 +60,7 @@ Ascendtis own's Instant validation AForm component.
 - Required
 - Email
 - Number
+- MinValue
+- MaxValue
+- MinLength
+- MaxLength

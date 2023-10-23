@@ -1,9 +1,9 @@
-import React, { FC, isValidElement, useEffect, useState, FormEvent } from 'react';
+import React, { FC, isValidElement, useEffect, useState, FormEvent, ReactElement, JSXElementConstructor } from 'react';
 import { get, map } from 'lodash';
 
 interface IProps {
     name?: string;
-    children: React.ReactNode | React.ReactNode[];
+    children: React.ReactNode | React.ReactNode[] | React.ReactElement | ReactElement<any, string | JSXElementConstructor<any>>; 
     values?: any; //It will be object
     onSubmit?: (values: any) => void;
     className?: string;

@@ -112,8 +112,10 @@ const AFormInput = forwardRef((props: IProps, ref) => {
         //         case 'strong_password': tmpError = isStrongPassword(); break;
         //         case 'ifsc': tmpError = isIfsc(); break;
                 case 'number': value === true ? tmpError = isNumber() : undefined; break;
-        //         case 'min': tmpError = isMin(newRule[1]); break;
-        //         case 'max': tmpError = isMax(newRule[1]); break;
+                case 'minValue': tmpError = isMin(value, 'value'); break;
+                case 'minLength': tmpError = isMin(value, 'length'); break;
+                case 'maxValue': tmpError = isMax(value, 'value'); break;
+                case 'maxLength': tmpError = isMax(value, 'length'); break;
         //         case 'between': tmpError = isBetween(newRule[1]); break;
         //         case 'url': tmpError = isUrl(); break;
         //         case 'mime': tmpError = hasMime(newRule[1]); break;
@@ -149,6 +151,43 @@ const AFormInput = forwardRef((props: IProps, ref) => {
         const errors: string[] = [];
         if (value && isNaN(Number(value))) {
             errors.push((validationName || name) + ' must be a number.');
+        }
+        return errors;
+    }
+    const isMin = (validationNumber: number, type: 'value' | 'length') => {//2 types available - value & length
+        const errors: string[] = [];
+        if (!value && !hasRequired()) return errors;
+        if (type == 'length') {
+            if (value && value.toString().length < validationNumber) {
+                if (Array.isArray(value)) {
+                    errors.push('You need to at least select ' + validationNumber + ' ' + (validationName || name));
+                } else {
+                    errors.push((validationName || name) + ' must be at least ' + validationNumber + ' characters long.');
+                }
+            }
+        } else if (type == 'value') {
+            if (value && parseFloat(value) < validationNumber) {
+                errors.push((validationName || name) + ' must be at least ' + validationNumber + '.');
+            }
+        }
+        return errors;
+    }
+    const isMax = (validationNumber: number, type: 'value' | 'length') => {//2 types available - value & length
+        const errors: string[] = [];
+        if (!value && !hasRequired()) return errors;
+        if (type == 'length') {
+            if (value && value.toString().length > validationNumber) {
+                if (Array.isArray(value)) {
+                    errors.push('You can maximum select ' + validationNumber + ' ' + (validationName || name));
+                    // You can maximum select 2 documents
+                } else {
+                    errors.push((validationName || name) + ' must be less than or equal to ' + validationNumber + ' characters long.');
+                }
+            }
+        } else if (type == 'value') {
+            if (value && parseFloat(value) > validationNumber) {
+                errors.push((validationName || name) + ' must be less than or equal to ' + validationNumber + '.');
+            }
         }
         return errors;
     }
