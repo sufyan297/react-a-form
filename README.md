@@ -64,3 +64,5 @@ Ascendtis own's Instant validation AForm component.
 - MaxValue
 - MinLength
 - MaxLength
+- MimeType
+- Url

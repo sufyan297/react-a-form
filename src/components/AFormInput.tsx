@@ -117,8 +117,8 @@ const AFormInput = forwardRef((props: IProps, ref) => {
                 case 'maxValue': tmpError = isMax(value, 'value'); break;
                 case 'maxLength': tmpError = isMax(value, 'length'); break;
         //         case 'between': tmpError = isBetween(newRule[1]); break;
-        //         case 'url': tmpError = isUrl(); break;
-        //         case 'mime': tmpError = hasMime(newRule[1]); break;
+                case 'url': value === true ? tmpError = isUrl() : undefined; break;
+                case 'mime': tmpError = hasMime(value); break;
             }
             errors = [...errors, ...tmpError];
         });
@@ -191,6 +191,31 @@ const AFormInput = forwardRef((props: IProps, ref) => {
         }
         return errors;
     }
+    const isUrl = () => {
+        const regEx = /^(((ftp|http|https):\/\/)|(\/)|(..\/))(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?$/;
+        const errors: string[] = [];
+        if (value && !regEx.test(value)) {
+            errors.push('Please include a valid url.');
+        }
+        return errors;
+    }
+    const hasMime = (validation: string) => {
+        const tmpValidation = validation ? validation.split(',') : []; //mime types
+        const errors: string[] = [];
+        let hasErrors = false;
+        if (value && value.length > 0) {
+            value.map((file: File) => {
+                const mimeIdx = tmpValidation.indexOf(file.type);
+                if (mimeIdx === -1) {
+                    hasErrors = true;
+                }
+            });
+        }
+        if (hasErrors) {
+            errors.push((validationName || name) + ' must be of the type: ' + validation);
+        }
+        return errors;
+    }
     //HELPER FUNCTIONS
     const hasRequired = () => {
         if (validation && validation.required && validation.required == true) {
@@ -198,7 +223,6 @@ const AFormInput = forwardRef((props: IProps, ref) => {
         }
         return false;
     }
-    
     return (
         <div>
         {
