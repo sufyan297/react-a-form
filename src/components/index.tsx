@@ -8,10 +8,16 @@ interface IProps {
     onSubmit?: (values: any) => void;
     className?: string;
     formLoading?: boolean;
+    forwardedRef?: {
+        current: {
+            getFormData: () => any;
+            setFormData: (values: any) => any;
+        }
+    };
 }
 
 const types = ['text', 'password', 'number', 'date', 'time', 'datetime', 'email', 'url', 'textarea', 'file', 'image', 'radio', 'checkbox', 'select', 'submit', 'createable-select', 'date-range', 'rich-text-editor', 'toggle'];
-const AForm: FC<IProps> = ({ name, children, values, onSubmit, className, formLoading = false }) => {
+const AForm: FC<IProps> = ({ name, children, values, onSubmit, className, formLoading = false, forwardedRef }) => {
 
     //States
     const [ formData, setFormData ] = useState<any>({ ...values });
@@ -32,6 +38,16 @@ const AForm: FC<IProps> = ({ name, children, values, onSubmit, className, formLo
             // console.log("NEW VALUES ARRIVED: ", values);
         }
     }, [values]);
+
+    // Expose the internal state through the ref
+    useEffect(() => {
+        if (forwardedRef) {
+            forwardedRef.current = {
+                getFormData: () => formData,
+                setFormData: (newValues: any) => setFormData(newValues),
+            };
+        }
+    }, [formData, forwardedRef]);
 
     let tErrors: {[key: string]: any} = {};
 
@@ -140,7 +156,7 @@ const AForm: FC<IProps> = ({ name, children, values, onSubmit, className, formLo
             </div>
         </div>
         :
-        <form key={refreshKey} name={name ? name : 'a-form'} onSubmit={handleSubmit} className={className}>
+        <form key={refreshKey} name={name ? name : 'a-form'} onSubmit={handleSubmit} className={`a-form ` + className}>
             {mapChildren(arrChildren)}
             {/* Errors: {JSON.stringify(errors)} */}
             {/* Form Values: {JSON.stringify(formData)} <br/>
