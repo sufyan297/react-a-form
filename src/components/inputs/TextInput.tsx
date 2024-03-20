@@ -46,8 +46,6 @@ const TextInput: FC<ITextInput> = ({
   const [iValue, setIValue] = useState('');
   const [isVisiblePassword, setVisiblePassword] = useState<boolean>(false);
 
-  console.log('Ivalkukjsxbzdc;::', type);
-
   useEffect(() => {
     if (maskPlaceholder && maskFormat && defaultValue) {
       const newValue = doPlaceholderMasking(defaultValue, maskFormat, maskPlaceholder);
