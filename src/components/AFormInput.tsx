@@ -10,12 +10,13 @@ import ComboBox from './inputs/ComboBox';
 import FileInput from './inputs/FileInput';
 import TextArea from './inputs/TextArea';
 import DatePicker from './inputs/DatePicker';
+import RadioButton from './inputs/RadioButton';
 
 interface IProps {
     name: string;
     label?: string | React.ReactNode;
     placeholder?: string;
-    type: 'text' | 'number' | 'password' | 'url' | 'email' | 'checkbox' | 'toggle' | 'select' | 'file' | 'image' | 'textarea' | 'date' | 'datetime' | 'time';
+    type: 'text' | 'number' | 'password' | 'url' | 'email' | 'checkbox' | 'toggle' | 'select' | 'file' | 'image' | 'textarea' | 'date' | 'datetime' | 'time' | 'radio';
     validation?: IValidations;
     validationName?: string;
     defaultValue?: string;
@@ -26,6 +27,9 @@ interface IProps {
 
     //File
     acceptMime?: string;
+
+    //Radio
+    inline?: boolean;
 
     //ComboBox / Select
     options?: ISelect[];
@@ -53,7 +57,7 @@ interface IProps {
 
 const AFormInput = forwardRef((props: IProps, ref) => {
     //Props
-    const { name, type, validation, validationName, label, placeholder, defaultValue, disabled, readOnly, autocomplete, acceptMime,
+    const { name, type, validation, validationName, label, placeholder, defaultValue, disabled, readOnly, autocomplete, acceptMime, inline,
         onValidate, removeElement, handleChange, onChange, onBlur, containerStyle, inputStyle, hint, containerClassName, inputClassName, multiple, loading, options, minDate, maxDate } = props;
 
     //States
@@ -315,6 +319,16 @@ const AFormInput = forwardRef((props: IProps, ref) => {
                     readonly={readOnly}
                     minDate={minDate}
                     maxDate={maxDate}
+                />
+            : type == 'radio' ?
+                <RadioButton
+                    name={name}
+                    hasError={errors && errors.length > 0 ? true : false}
+                    onChange={(value) => onInputChange(value)}
+                    defaultValue={defaultValue}
+                    disabled={disabled}
+                    options={options ?? []}
+                    inline={inline}
                 />
             : null
         }

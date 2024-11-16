@@ -53,7 +53,7 @@ Ascendtis own's Instant validation AForm component.
 - Toggle Switch
 - Action Button
 - TextArea
-
+- Radio Button
   
 
 ## Validations
