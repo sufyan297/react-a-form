@@ -25,7 +25,7 @@ const Checkbox: FC<IProps> = ({ onChange, inputClassName, containerClassName, di
 
       <div className={`pl-2`}>
         {label && typeof label == 'string' ? (
-          <label htmlFor={name} className={`text-gray`}>
+          <label htmlFor={name} className={`text-gray-800`}>
             {label}
           </label>
         ) : label ? (

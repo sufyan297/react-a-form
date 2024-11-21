@@ -30,7 +30,7 @@ const RadioButton: React.FC<IProps> = ({ name, disabled, options, onChange, onBl
           <div className="flex" key={name + '-' + index}>
             <div className="mr-3">
               <label
-                className='cursor-pointer leading-2'
+                className='cursor-pointer leading-2 text-gray-800'
                 style={{ display: 'flex', alignItems: 'center' }}
               >
                 {labelPosition == 'prefix' ? (
