@@ -35,6 +35,7 @@ interface IProps {
     options?: ISelect[];
     multiple?: boolean;
     loading?: boolean;
+    onSearch?: (text: string) => Promise<ISelect[]>;
 
     //Syles
     containerStyle?: CSSProperties;
@@ -58,7 +59,7 @@ interface IProps {
 const AFormInput = forwardRef((props: IProps, ref) => {
     //Props
     const { name, type, validation, validationName, label, placeholder, defaultValue, disabled, readOnly, autocomplete, acceptMime, inline,
-        onValidate, removeElement, handleChange, onChange, onBlur, containerStyle, inputStyle, hint, containerClassName, inputClassName, multiple, loading, options, minDate, maxDate } = props;
+        onValidate, removeElement, handleChange, onChange, onBlur, containerStyle, inputStyle, hint, containerClassName, inputClassName, multiple, loading, options, minDate, maxDate, onSearch } = props;
 
     //States
     const [value, setValue] = useState<any>(defaultValue); //string | undefined - defaultValue : undefined
@@ -272,11 +273,11 @@ const AFormInput = forwardRef((props: IProps, ref) => {
                     disabled={disabled}
                     inputClassName={inputClassName}
                 />
-            : type == 'select' && options ?
+            : type == 'select' ?
                 <ComboBox
                     name={name}
                     hasError={errors && errors.length > 0 ? true : false}
-                    options={options}
+                    options={options ?? []}
                     defaultValue={defaultValue}
                     disabled={disabled}
                     containerStyle={containerStyle}
@@ -285,6 +286,7 @@ const AFormInput = forwardRef((props: IProps, ref) => {
                     loading={loading}
                     onChange={(value) => onInputChange(value)}
                     placeholder={placeholder}
+                    onSearch={onSearch}
                 />
             : type == 'file' || type == 'image' ?
                 <FileInput

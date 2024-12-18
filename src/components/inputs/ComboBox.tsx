@@ -1,5 +1,6 @@
 import React, { CSSProperties, FC } from 'react';
-import Select, { InputActionMeta, MultiValue, SingleValue } from 'react-select'
+import Select, { InputActionMeta, MultiValue, SingleValue } from 'react-select';
+import AsyncSelect from 'react-select/async';
 import { ISelect } from '../../types';
 import { debounce } from 'lodash';
 
@@ -16,10 +17,12 @@ interface IProps {
     containerStyle?: CSSProperties;
     inputStyle?: CSSProperties;
     disabled?: boolean;
+    onSearch?: (text: string) => Promise<ISelect[]>;
 }
-const ComboBox: FC<IProps> = ({ onChange, onBlur, disabled, hasError, name, options, multiple, loading, defaultValue, placeholder, containerStyle, inputStyle }) => {
+const ComboBox: FC<IProps> = ({ onChange, onBlur, disabled, hasError, name, options, multiple, loading, defaultValue, placeholder, containerStyle, inputStyle, onSearch }) => {
+    
     //Methods
-    const onInputChange = (val: string, meta: InputActionMeta) => {
+    const onInputChange = async (val: string, meta: InputActionMeta) => {
         if (meta.action == 'input-change') {
             console.log("VALUE: ", val);
             //Fetch API / OR / Asked Parent component for Updated Options.
@@ -32,11 +35,45 @@ const ComboBox: FC<IProps> = ({ onChange, onBlur, disabled, hasError, name, opti
     const handleBlur = () => {
         onBlur ? onBlur() : null;
     }
+    // Create a debounced function that returns a promise
+    const debouncedOnSearch = debounce(
+        (inputValue: string, resolve: (value: ISelect[]) => void) => {
+            const result = onSearch ? onSearch(inputValue) : Promise.resolve([]);
+            result.then(resolve);
+        },
+        300 // Debounce delay in milliseconds
+    );
+    const filterOptions = async (inputValue: string) => {
+        const options = await new Promise<ISelect[]>((resolve) => {
+            debouncedOnSearch(inputValue, resolve);
+        });
+        return options.filter((i) =>
+            i.label.toLowerCase().includes(inputValue.toLowerCase())
+        );
+    };
     return (
+        onSearch ?
+            <AsyncSelect 
+                cacheOptions 
+                defaultOptions 
+                loadOptions={filterOptions} 
+                isMulti={multiple ? multiple : false} isDisabled={disabled} 
+                classNames={{
+                    control: (state) =>
+                        !hasError ?
+                            state.isFocused ? '!focus:outline-none !focus:ring-none !border-primary !hover:border-primary' : 'border-gray'
+                            : '!border-red-700 border-1',
+                    option: (state) =>
+                        state.isFocused && !state.isSelected ? '!bg-primary/50 text-white' : state.isSelected ? '!bg-primary text-white' : ''
+                }}
+                onBlur={handleBlur}
+                onChange={handleChange}
+                placeholder={placeholder}
+            />
+        :
         <Select
             name={name}
             options={options}
-            isMulti={multiple ? multiple : false}
             onChange={handleChange}
             onBlur={handleBlur}
             isLoading={loading}
