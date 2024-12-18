@@ -69,6 +69,7 @@ const ComboBox: FC<IProps> = ({ onChange, onBlur, disabled, hasError, name, opti
                 onBlur={handleBlur}
                 onChange={handleChange}
                 placeholder={placeholder}
+                defaultValue={defaultValue}
             />
         :
         <Select
