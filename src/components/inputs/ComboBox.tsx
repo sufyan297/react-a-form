@@ -25,6 +25,7 @@ const ComboBox: FC<IProps> = ({ onChange, onBlur, disabled, hasError, name, opti
     useEffect(() => {
         if (defaultValue != newValue) {
             setNewValue(defaultValue);
+            console.log("VALUE: ", defaultValue, newValue)
         }
     }, [defaultValue]);
 
@@ -86,8 +87,7 @@ const ComboBox: FC<IProps> = ({ onChange, onBlur, disabled, hasError, name, opti
             onChange={handleChange}
             onBlur={handleBlur}
             isLoading={loading}
-            defaultValue={newValue}
-            value={newValue}
+            defaultValue={defaultValue}
             placeholder={placeholder}
             onInputChange={debounce(onInputChange, 500)}
             isDisabled={disabled}
