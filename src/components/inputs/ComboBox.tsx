@@ -1,4 +1,4 @@
-import React, { CSSProperties, FC } from 'react';
+import React, { CSSProperties, FC, useEffect, useState } from 'react';
 import Select, { InputActionMeta, MultiValue, SingleValue } from 'react-select';
 import AsyncSelect from 'react-select/async';
 import { ISelect } from '../../types';
@@ -21,6 +21,13 @@ interface IProps {
 }
 const ComboBox: FC<IProps> = ({ onChange, onBlur, disabled, hasError, name, options, multiple, loading, defaultValue, placeholder, containerStyle, inputStyle, onSearch }) => {
     
+    const [ newValue, setNewValue ] = useState<ISelect | null | undefined>(defaultValue);
+    useEffect(() => {
+        if (defaultValue != newValue) {
+            setNewValue(defaultValue);
+        }
+    }, [defaultValue]);
+
     //Methods
     const onInputChange = async (val: string, meta: InputActionMeta) => {
         if (meta.action == 'input-change') {
@@ -69,7 +76,8 @@ const ComboBox: FC<IProps> = ({ onChange, onBlur, disabled, hasError, name, opti
                 onBlur={handleBlur}
                 onChange={handleChange}
                 placeholder={placeholder}
-                defaultValue={defaultValue}
+                defaultValue={newValue}
+                value={newValue}
             />
         :
         <Select
@@ -78,7 +86,8 @@ const ComboBox: FC<IProps> = ({ onChange, onBlur, disabled, hasError, name, opti
             onChange={handleChange}
             onBlur={handleBlur}
             isLoading={loading}
-            defaultValue={defaultValue}
+            defaultValue={newValue}
+            value={newValue}
             placeholder={placeholder}
             onInputChange={debounce(onInputChange, 500)}
             isDisabled={disabled}
