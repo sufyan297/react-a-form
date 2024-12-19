@@ -23,9 +23,8 @@ const ComboBox: FC<IProps> = ({ onChange, onBlur, disabled, hasError, name, opti
     
     const [ newValue, setNewValue ] = useState<ISelect | null | undefined>(defaultValue);
     useEffect(() => {
-        if (defaultValue != newValue) {
+        if (defaultValue != newValue && onSearch) {
             setNewValue(defaultValue);
-            console.log("VALUE: ", defaultValue, newValue)
         }
     }, [defaultValue]);
 
