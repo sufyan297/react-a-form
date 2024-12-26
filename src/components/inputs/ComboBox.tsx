@@ -1,5 +1,5 @@
 import React, { CSSProperties, FC, useEffect, useState } from 'react';
-import Select, { InputActionMeta, MultiValue, SingleValue } from 'react-select';
+import Select, { MultiValue, SingleValue } from 'react-select';
 import AsyncSelect from 'react-select/async';
 import { ISelect } from '../../types';
 import { debounce } from 'lodash';
@@ -29,12 +29,6 @@ const ComboBox: FC<IProps> = ({ onChange, onBlur, disabled, hasError, name, opti
     }, [defaultValue]);
 
     //Methods
-    const onInputChange = async (val: string, meta: InputActionMeta) => {
-        if (meta.action == 'input-change') {
-            console.log("VALUE: ", val);
-            //Fetch API / OR / Asked Parent component for Updated Options.
-        }
-    }
     const handleChange = (item: SingleValue<ISelect> | MultiValue<ISelect>) => {
         console.log("SELECTED ITEM: ", item);
         onChange ? onChange(item) : null;
@@ -88,7 +82,6 @@ const ComboBox: FC<IProps> = ({ onChange, onBlur, disabled, hasError, name, opti
             isLoading={loading}
             defaultValue={defaultValue}
             placeholder={placeholder}
-            onInputChange={debounce(onInputChange, 500)}
             isDisabled={disabled}
             closeMenuOnSelect={multiple ? false : true}
             styles={{
