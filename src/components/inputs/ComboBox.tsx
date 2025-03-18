@@ -65,13 +65,14 @@ const ComboBox: FC<IProps> = ({ onChange, onBlur, disabled, hasError, name, opti
                 defaultOptions 
                 loadOptions={filterOptions} 
                 isMulti={multiple ? multiple : false} isDisabled={disabled} 
+                isClearable={isCreatable}
                 classNames={{
                     control: (state) =>
                         !hasError ?
                             state.isFocused ? '!focus:outline-none !focus:ring-none !border-primary !hover:border-primary' : 'border-gray'
                             : '!border-red-700 border-1',
                     option: (state) =>
-                        state.isFocused && !state.isSelected ? '!bg-primary/50 text-white' : state.isSelected ? '!bg-primary text-white' : ''
+                        state.isFocused && !state.isSelected ? '!bg-primary/50 text-white' : state.isSelected ? '!bg-primary text-white' : '!text-black'
                 }}
                 onBlur={handleBlur}
                 onChange={handleChange}
@@ -91,6 +92,7 @@ const ComboBox: FC<IProps> = ({ onChange, onBlur, disabled, hasError, name, opti
             isDisabled={disabled}
             closeMenuOnSelect={multiple ? false : true}
             isMulti={multiple}
+            isClearable={isCreatable}
             styles={{
                 control: (baseStyles) => ({
                     ...baseStyles,
@@ -116,7 +118,7 @@ const ComboBox: FC<IProps> = ({ onChange, onBlur, disabled, hasError, name, opti
                         state.isFocused ? '!focus:outline-none !focus:ring-none !border-primary !hover:border-primary' : 'border-gray'
                         : '!border-red-700 border-1',
                 option: (state) =>
-                    state.isFocused && !state.isSelected ? '!bg-primary/50 text-white' : state.isSelected ? '!bg-primary text-white' : ''
+                    state.isFocused && !state.isSelected ? '!bg-primary/50 text-white' : state.isSelected ? '!bg-primary text-white' : '!text-black'
             }}
         />
     )
