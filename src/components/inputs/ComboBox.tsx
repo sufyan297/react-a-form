@@ -1,6 +1,8 @@
 import React, { CSSProperties, FC, useEffect, useState } from 'react';
 import Select, { MultiValue, SingleValue } from 'react-select';
 import AsyncSelect from 'react-select/async';
+import CreatableSelect from 'react-select/creatable';
+import AsyncCreatableSelect from 'react-select/async-creatable';
 import { ISelect } from '../../types';
 import { debounce } from 'lodash';
 
@@ -18,8 +20,9 @@ interface IProps {
     inputStyle?: CSSProperties;
     disabled?: boolean;
     onSearch?: (text: string) => Promise<ISelect[]>;
+    isCreatable?: boolean;
 }
-const ComboBox: FC<IProps> = ({ onChange, onBlur, disabled, hasError, name, options, multiple, loading, defaultValue, placeholder, containerStyle, inputStyle, onSearch }) => {
+const ComboBox: FC<IProps> = ({ onChange, onBlur, disabled, hasError, name, options, multiple, loading, defaultValue, placeholder, containerStyle, inputStyle, onSearch, isCreatable }) => {
     
     const [ newValue, setNewValue ] = useState<ISelect | null | undefined>(defaultValue);
     useEffect(() => {
@@ -52,9 +55,12 @@ const ComboBox: FC<IProps> = ({ onChange, onBlur, disabled, hasError, name, opti
             i.label.toLowerCase().includes(inputValue.toLowerCase())
         );
     };
+
+    const CustomSelect = isCreatable ? CreatableSelect : Select;
+    const CustomAsyncSelect = isCreatable && onSearch ? AsyncCreatableSelect : AsyncSelect;
     return (
         onSearch ?
-            <AsyncSelect 
+            <CustomAsyncSelect 
                 cacheOptions 
                 defaultOptions 
                 loadOptions={filterOptions} 
@@ -74,7 +80,7 @@ const ComboBox: FC<IProps> = ({ onChange, onBlur, disabled, hasError, name, opti
                 value={newValue}
             />
         :
-        <Select
+        <CustomSelect
             name={name}
             options={options}
             onChange={handleChange}
@@ -84,6 +90,7 @@ const ComboBox: FC<IProps> = ({ onChange, onBlur, disabled, hasError, name, opti
             placeholder={placeholder}
             isDisabled={disabled}
             closeMenuOnSelect={multiple ? false : true}
+            isMulti={multiple}
             styles={{
                 control: (baseStyles) => ({
                     ...baseStyles,

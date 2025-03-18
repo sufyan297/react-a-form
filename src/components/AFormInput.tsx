@@ -36,6 +36,7 @@ interface IProps {
     multiple?: boolean;
     loading?: boolean;
     onSearch?: (text: string) => Promise<ISelect[]>;
+    isCreatable?: boolean;
 
     //Syles
     containerStyle?: CSSProperties;
@@ -59,7 +60,8 @@ interface IProps {
 const AFormInput = forwardRef((props: IProps, ref) => {
     //Props
     const { name, type, validation, validationName, label, placeholder, defaultValue, disabled, readOnly, autocomplete, acceptMime, inline,
-        onValidate, removeElement, handleChange, onChange, onBlur, containerStyle, inputStyle, hint, containerClassName, inputClassName, multiple, loading, options, minDate, maxDate, onSearch } = props;
+        onValidate, removeElement, handleChange, onChange, onBlur, containerStyle, inputStyle, hint, containerClassName, inputClassName, multiple, 
+        loading, options, minDate, maxDate, onSearch, isCreatable } = props;
 
     //States
     const [value, setValue] = useState<any>(defaultValue); //string | undefined - defaultValue : undefined
@@ -287,6 +289,7 @@ const AFormInput = forwardRef((props: IProps, ref) => {
                     onChange={(value) => onInputChange(value)}
                     placeholder={placeholder}
                     onSearch={onSearch}
+                    isCreatable={isCreatable}
                 />
             : type == 'file' || type == 'image' ?
                 <FileInput
