@@ -54,6 +54,7 @@ Ascendtis own's Instant validation AForm component.
 - Action Button
 - TextArea
 - Radio Button
+- Input Group (Repeatable)
   
 
 ## Validations
