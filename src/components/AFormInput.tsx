@@ -61,17 +61,21 @@ interface IProps {
     repeatable?: boolean;
     children?: ReactElement<any> | ReactElement<any>[];
     collectChildRef?: (ref: React.RefObject<any>, fieldName: string) => void;
+    addLabel?: string;
+    uniqueId?: string;
 }
 
 const AFormInput = forwardRef((props: IProps, ref) => {
     //Props
     const { name, type, validation, validationName, label, placeholder, defaultValue, disabled, readOnly, autocomplete, acceptMime, inline,
         onValidate, removeElement, handleChange, onChange, onBlur, containerStyle, inputStyle, hint, containerClassName, inputClassName, multiple,
-        loading, options, minDate, maxDate, onSearch, isCreatable, repeatable, children, collectChildRef } = props;
+        loading, options, minDate, maxDate, onSearch, isCreatable, repeatable, children, collectChildRef, addLabel } = props;
 
     //States
     const [value, setValue] = useState<any>(defaultValue); //string | undefined - defaultValue : undefined
     const [errors, setErrors] = useState<string[]>([]);
+
+    const inputId = props.uniqueId ? `${name}-${props.uniqueId}` : name;
 
     //Effects
     useEffect(() => {
@@ -240,7 +244,7 @@ const AFormInput = forwardRef((props: IProps, ref) => {
         <div>
             {
                 label && typeof label == 'string' && !['checkbox', 'toggle'].includes(type) ?
-                    <label htmlFor={name} className={'block text-sm font-medium leading-6 text-gray-800 mb-1.5'}>{label}{hasRequired() ? <span className='text-red-700 text-xs'>*</span> : null}</label>
+                    <label htmlFor={inputId} className={'block text-sm font-medium leading-6 text-gray-800 mb-1.5'}>{label}{hasRequired() ? <span className='text-red-700 text-xs'>*</span> : null}</label>
                     : null
             }
             {
@@ -262,6 +266,7 @@ const AFormInput = forwardRef((props: IProps, ref) => {
                         // maskPlaceholder={maskPlaceholder}
                         // maskFormat={maskFormat}
                         autocomplete={autocomplete}
+                        id={inputId}
                     />
                     : type == 'toggle' ?
                         <ToggleSwitch
@@ -344,7 +349,7 @@ const AFormInput = forwardRef((props: IProps, ref) => {
                                                 : type === 'group' ?
                                                     <GroupInput
                                                         name={name}
-                                                        label={label?.toString()}
+                                                        addLabel={addLabel?.toString()}
                                                         repeatable={repeatable}
                                                         children={children}
                                                         onChange={onChange}

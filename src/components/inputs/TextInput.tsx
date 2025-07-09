@@ -19,6 +19,7 @@ interface ITextInput {
   inputClassName?: string;
   maskPlaceholder?: string;
   maskFormat?: string;
+  id?: string;
 }
 
 const TextInput: FC<ITextInput> = ({
@@ -40,6 +41,7 @@ const TextInput: FC<ITextInput> = ({
   //   icon,
   containerClassName,
   inputClassName,
+  id
 }) => {
   //States
   const [iPlaceholder, setIPlaceholder] = useState(placeholder);
@@ -142,7 +144,7 @@ ${styles["text-input"]}
             className={`focus:outline-none block flex-1 border-0 bg-transparent py-1.5 pl-3 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6 ${inputClassName}`}
             type={isVisiblePassword ? 'text' : type}
             disabled={disabled}
-            id={name}
+            id={id}
             name={name}
             placeholder={iPlaceholder}
             readOnly={readonly}

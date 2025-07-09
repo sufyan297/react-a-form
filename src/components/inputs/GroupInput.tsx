@@ -9,9 +9,9 @@ interface IGroupInputProps {
     repeatable?: boolean;
     children?: ReactElement<any> | ReactElement<any>[];
     onChange?: (val: { [key: string]: any }[]) => void;
-    label?: string;
+    addLabel?: string;
     defaultValue?: any;
-    handleChange?: (name: string, value: string | string[] | boolean | IFile[] | { [key: string]: any }[]) => void;
+    handleChange?: (name: string, value: string | string[] | boolean | IFile[] | { [key: string]: any }[] | any) => void;
     collectChildRef?: (ref: React.RefObject<any>, fieldName: string) => void;
     inputClassName?: string;
     containerClassName?: string;
@@ -27,7 +27,7 @@ const GroupInput: React.FC<IGroupInputProps> = ({
     collectChildRef,
     inputClassName,
     containerClassName,
-    label = "+ Add More"
+    addLabel = "+ Add More"
 }) => {
 
     if (!children) {
@@ -46,7 +46,7 @@ const GroupInput: React.FC<IGroupInputProps> = ({
     const [groupValues, setGroupValues] = useState<{ [key: string]: any }[]>(
         Array.isArray(defaultValue) && defaultValue.length > 0
             ? defaultValue
-            : [{}]
+            : (defaultValue ? [defaultValue] : [{}]) 
     );
 
     const onAddMore = () => {
@@ -76,7 +76,8 @@ const GroupInput: React.FC<IGroupInputProps> = ({
                 [fieldName]: value,
             };
             // onChange?.(updated);
-            handleChange && handleChange(name, updated);
+            const newUpdated = repeatable ? updated : updated[0]
+            handleChange && handleChange(name, newUpdated);
             return updated;
         });
     };
@@ -92,7 +93,7 @@ const GroupInput: React.FC<IGroupInputProps> = ({
                             aria-label="Remove"
                         >
                             <svg
-                                className="w-4 h-4"
+                                className="w-[14px] h-[14px]"
                                 fill="none"
                                 stroke="currentColor"
                                 strokeWidth="3"
@@ -124,8 +125,11 @@ const GroupInput: React.FC<IGroupInputProps> = ({
                                     },
                                     onblur: () => {
                                         onChange?.(groupValues);
-                                        handleChange?.(name, groupValues);
-                                    }
+                                        const newValues = repeatable ? groupValues : groupValues[0];
+                                        handleChange?.(name, newValues);
+                                    },
+                                    uniqueId: `${index}`,
+                                    id: `${name}-${index}`
                                 };
 
                                 const originalRef = (el as any).ref;
@@ -171,7 +175,7 @@ const GroupInput: React.FC<IGroupInputProps> = ({
                         type="button"
                         className={`flex items-center gap-2 px-4 py-2 text-sm font-medium text-primary hover:text-white border border-gray-200 hover:bg-primary rounded-lg hover:bg-gray-700 transition-all duration-200 ${inputClassName}`}
                     >
-                        {label}
+                        {addLabel}
                     </button>
                 )
             }
