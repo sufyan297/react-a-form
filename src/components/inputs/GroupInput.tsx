@@ -123,7 +123,7 @@ const GroupInput: React.FC<IGroupInputProps> = ({
                                         const value = e?.target?.value ?? e;
                                         handleGroupChange(index, name, value);
                                     },
-                                    onblur: () => {
+                                    onBlur: () => {
                                         onChange?.(groupValues);
                                         const newValues = repeatable ? groupValues : groupValues[0];
                                         handleChange?.(name, newValues);
