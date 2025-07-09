@@ -1,4 +1,4 @@
-import React, { CSSProperties, forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+import React, { CSSProperties, forwardRef, ReactElement, useEffect, useImperativeHandle, useState } from 'react';
 import { map } from 'lodash';
 
 //Input components
@@ -11,12 +11,13 @@ import FileInput from './inputs/FileInput';
 import TextArea from './inputs/TextArea';
 import DatePicker from './inputs/DatePicker';
 import RadioButton from './inputs/RadioButton';
+import GroupInput from './inputs/GroupInput';
 
 interface IProps {
     name: string;
     label?: string | React.ReactNode;
     placeholder?: string;
-    type: 'text' | 'number' | 'password' | 'url' | 'email' | 'checkbox' | 'toggle' | 'select' | 'file' | 'image' | 'textarea' | 'date' | 'datetime' | 'time' | 'radio';
+    type: 'text' | 'number' | 'password' | 'url' | 'email' | 'checkbox' | 'toggle' | 'select' | 'file' | 'image' | 'textarea' | 'date' | 'datetime' | 'time' | 'radio' | 'group';
     validation?: IValidations;
     validationName?: string;
     defaultValue?: string;
@@ -55,13 +56,18 @@ interface IProps {
     //Date
     minDate?: string;
     maxDate?: string;
+
+    //Group
+    repeatable?: boolean;
+    children?: ReactElement<any> | ReactElement<any>[];
+    collectChildRef?: (ref: React.RefObject<any>, fieldName: string) => void;
 }
 
 const AFormInput = forwardRef((props: IProps, ref) => {
     //Props
     const { name, type, validation, validationName, label, placeholder, defaultValue, disabled, readOnly, autocomplete, acceptMime, inline,
-        onValidate, removeElement, handleChange, onChange, onBlur, containerStyle, inputStyle, hint, containerClassName, inputClassName, multiple, 
-        loading, options, minDate, maxDate, onSearch, isCreatable } = props;
+        onValidate, removeElement, handleChange, onChange, onBlur, containerStyle, inputStyle, hint, containerClassName, inputClassName, multiple,
+        loading, options, minDate, maxDate, onSearch, isCreatable, repeatable, children, collectChildRef } = props;
 
     //States
     const [value, setValue] = useState<any>(defaultValue); //string | undefined - defaultValue : undefined
@@ -111,19 +117,19 @@ const AFormInput = forwardRef((props: IProps, ref) => {
         // console.log("RULES: ", rules);
         let errors: string[] = [];
         validation && map(validation,(value: any, rule: string) => {
-        //     const newRule = rule ? rule.split(':') : [];
+            //     const newRule = rule ? rule.split(':') : [];
             let tmpError: string[] = [];
             switch (rule) {
                 case 'required': value === true ? tmpError = isRequired() : undefined; break;
                 case 'email': value === true ? tmpError = isEmail() : undefined; break;
-        //         case 'strong_password': tmpError = isStrongPassword(); break;
-        //         case 'ifsc': tmpError = isIfsc(); break;
+                //         case 'strong_password': tmpError = isStrongPassword(); break;
+                //         case 'ifsc': tmpError = isIfsc(); break;
                 case 'number': value === true ? tmpError = isNumber() : undefined; break;
                 case 'minValue': tmpError = isMin(value, 'value'); break;
                 case 'minLength': tmpError = isMin(value, 'length'); break;
                 case 'maxValue': tmpError = isMax(value, 'value'); break;
                 case 'maxLength': tmpError = isMax(value, 'length'); break;
-        //         case 'between': tmpError = isBetween(newRule[1]); break;
+                //         case 'between': tmpError = isBetween(newRule[1]); break;
                 case 'url': value === true ? tmpError = isUrl() : undefined; break;
                 case 'mime': tmpError = hasMime(value); break;
             }
@@ -232,125 +238,138 @@ const AFormInput = forwardRef((props: IProps, ref) => {
     }
     return (
         <div>
-        {
-            label && typeof label == 'string' && !['checkbox', 'toggle'].includes(type) ?
-                <label htmlFor={name} className={'block text-sm font-medium leading-6 text-gray-800 mb-1.5'}>{label}{hasRequired() ? <span className='text-red-700 text-xs'>*</span> : null}</label>
-                : null
-        }
-        {
-            (type == 'text' || type == 'number' || type == 'email' || type == 'url' || type == 'password') ?
-                <TextInput
-                    name={name}
-                    type={type}
-                    hasError={errors && errors.length > 0 ? true : false}
-                    onChange={(value) => onInputChange(value)}
-                    onBlur={onInputBlur}
-                    defaultValue={defaultValue}
-                    placeholder={placeholder}
-                    disabled={disabled}
-                    readonly={readOnly}
-                    containerStyle={containerStyle}
-                    inputStyle={inputStyle}
-                    containerClassName={containerClassName}
-                    inputClassName={inputClassName}
-                    // maskPlaceholder={maskPlaceholder}
-                    // maskFormat={maskFormat}
-                    autocomplete={autocomplete}
-                />
-            : type == 'toggle' ?
-                <ToggleSwitch
-                    name={name}
-                    label={label}
-                    onChange={() => onInputChange(!value)}
-                    defaultValue={value}
-                    containerClassName={containerClassName}
-                />
-            : type == 'checkbox' ?
-                <Checkbox
-                    name={name}
-                    label={label}
-                    onChange={() => onInputChange(!value)}
-                    defaultValue={value}
-                    containerClassName={containerClassName}
-                    disabled={disabled}
-                    inputClassName={inputClassName}
-                />
-            : type == 'select' ?
-                <ComboBox
-                    name={name}
-                    hasError={errors && errors.length > 0 ? true : false}
-                    options={options ?? []}
-                    defaultValue={defaultValue}
-                    disabled={disabled}
-                    containerStyle={containerStyle}
-                    inputStyle={inputStyle}
-                    multiple={multiple}
-                    loading={loading}
-                    onChange={(value) => onInputChange(value)}
-                    placeholder={placeholder}
-                    onSearch={onSearch}
-                    isCreatable={isCreatable}
-                />
-            : type == 'file' || type == 'image' ?
-                <FileInput
-                    name={name}
-                    type={type}
-                    multiple={multiple}
-                    accept={type === 'image' ? 'image/*' : acceptMime}
-                    onChange={(files) => onInputChange(files)}
-                />
-            : type == 'textarea' ?
-                <TextArea
-                    name={name}
-                    hasError={errors && errors.length > 0 ? true : false}
-                    onChange={(value) => onInputChange(value)}
-                    defaultValue={defaultValue}
-                    placeholder={placeholder}
-                    disabled={disabled}
-                    readonly={readOnly}
-                    containerStyle={containerStyle}
-                    inputStyle={inputStyle}
-                    containerClassName={containerClassName}
-                    inputClassName={inputClassName}
-                />
-            : type == 'date' || type == 'datetime' || type == 'time' ?
-                <DatePicker
-                    type={type}
-                    name={name}
-                    hasError={errors && errors.length > 0 ? true : false}
-                    onChange={(value) => onInputChange(value)}
-                    defaultValue={defaultValue}
-                    disabled={disabled}
-                    readonly={readOnly}
-                    minDate={minDate}
-                    maxDate={maxDate}
-                />
-            : type == 'radio' ?
-                <RadioButton
-                    name={name}
-                    hasError={errors && errors.length > 0 ? true : false}
-                    onChange={(value) => onInputChange(value)}
-                    defaultValue={defaultValue}
-                    disabled={disabled}
-                    options={options ?? []}
-                    inline={inline}
-                />
-            : null
-        }
-        {
-            hint ? <span className="text-gray text-sm" style={{ color: '#a9a9a9' }}>{hint}</span> : null
-        }
-        {
-            errors && errors.length > 0 ?
-                <div className="text-red-700">
-                    {
-                        errors.map((error, idx) => (
-                            <p key={name + idx} style={{ marginBottom: '2px', marginTop: 0 }} className='text-sm'>{error}</p>
-                        ))
-                    }
-                </div>
-                : null
-        }
+            {
+                label && typeof label == 'string' && !['checkbox', 'toggle'].includes(type) ?
+                    <label htmlFor={name} className={'block text-sm font-medium leading-6 text-gray-800 mb-1.5'}>{label}{hasRequired() ? <span className='text-red-700 text-xs'>*</span> : null}</label>
+                    : null
+            }
+            {
+                (type == 'text' || type == 'number' || type == 'email' || type == 'url' || type == 'password') ?
+                    <TextInput
+                        name={name}
+                        type={type}
+                        hasError={errors && errors.length > 0 ? true : false}
+                        onChange={(value) => onInputChange(value)}
+                        onBlur={onInputBlur}
+                        defaultValue={defaultValue}
+                        placeholder={placeholder}
+                        disabled={disabled}
+                        readonly={readOnly}
+                        containerStyle={containerStyle}
+                        inputStyle={inputStyle}
+                        containerClassName={containerClassName}
+                        inputClassName={inputClassName}
+                        // maskPlaceholder={maskPlaceholder}
+                        // maskFormat={maskFormat}
+                        autocomplete={autocomplete}
+                    />
+                    : type == 'toggle' ?
+                        <ToggleSwitch
+                            name={name}
+                            label={label}
+                            onChange={() => onInputChange(!value)}
+                            defaultValue={value}
+                            containerClassName={containerClassName}
+                        />
+                        : type == 'checkbox' ?
+                            <Checkbox
+                                name={name}
+                                label={label}
+                                onChange={() => onInputChange(!value)}
+                                defaultValue={value}
+                                containerClassName={containerClassName}
+                                disabled={disabled}
+                                inputClassName={inputClassName}
+                            />
+                            : type == 'select' ?
+                                <ComboBox
+                                    name={name}
+                                    hasError={errors && errors.length > 0 ? true : false}
+                                    options={options ?? []}
+                                    defaultValue={defaultValue}
+                                    disabled={disabled}
+                                    containerStyle={containerStyle}
+                                    inputStyle={inputStyle}
+                                    multiple={multiple}
+                                    loading={loading}
+                                    onChange={(value) => onInputChange(value)}
+                                    placeholder={placeholder}
+                                    onSearch={onSearch}
+                                    isCreatable={isCreatable}
+                                />
+                                : type == 'file' || type == 'image' ?
+                                    <FileInput
+                                        name={name}
+                                        type={type}
+                                        multiple={multiple}
+                                        accept={type === 'image' ? 'image/*' : acceptMime}
+                                        onChange={(files) => onInputChange(files)}
+                                    />
+                                    : type == 'textarea' ?
+                                        <TextArea
+                                            name={name}
+                                            hasError={errors && errors.length > 0 ? true : false}
+                                            onChange={(value) => onInputChange(value)}
+                                            defaultValue={defaultValue}
+                                            placeholder={placeholder}
+                                            disabled={disabled}
+                                            readonly={readOnly}
+                                            containerStyle={containerStyle}
+                                            inputStyle={inputStyle}
+                                            containerClassName={containerClassName}
+                                            inputClassName={inputClassName}
+                                        />
+                                        : type == 'date' || type == 'datetime' || type == 'time' ?
+                                            <DatePicker
+                                                type={type}
+                                                name={name}
+                                                hasError={errors && errors.length > 0 ? true : false}
+                                                onChange={(value) => onInputChange(value)}
+                                                defaultValue={defaultValue}
+                                                disabled={disabled}
+                                                readonly={readOnly}
+                                                minDate={minDate}
+                                                maxDate={maxDate}
+                                            />
+                                            : type == 'radio' ?
+                                                <RadioButton
+                                                    name={name}
+                                                    hasError={errors && errors.length > 0 ? true : false}
+                                                    onChange={(value) => onInputChange(value)}
+                                                    defaultValue={defaultValue}
+                                                    disabled={disabled}
+                                                    options={options ?? []}
+                                                    inline={inline}
+                                                />
+                                                : type === 'group' ?
+                                                    <GroupInput
+                                                        name={name}
+                                                        label={label?.toString()}
+                                                        repeatable={repeatable}
+                                                        children={children}
+                                                        onChange={onChange}
+                                                        defaultValue={defaultValue as any}
+                                                        handleChange={handleChange as any}
+                                                        collectChildRef={collectChildRef}
+                                                        inputClassName={inputClassName}
+                                                        containerClassName={containerClassName}
+                                                    />
+                                                    : null
+            }
+            {
+                hint ? <span className="text-gray text-sm" style={{ color: '#a9a9a9' }}>{hint}</span> : null
+            }
+            {
+                errors && errors.length > 0 ?
+                    <div className="text-red-700">
+                        {
+                            errors.map((error, idx) => (
+                                <p key={name + idx} style={{ marginBottom: '2px', marginTop: 0 }} className='text-sm'>{error}</p>
+                            ))
+                        }
+                    </div>
+                    : null
+            }
         </div>
     )
 });
