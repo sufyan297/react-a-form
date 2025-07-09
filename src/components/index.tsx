@@ -16,7 +16,7 @@ interface IProps {
     };
 }
 
-const types = ['text', 'password', 'number', 'date', 'time', 'datetime', 'email', 'url', 'textarea', 'file', 'image', 'radio', 'checkbox', 'select', 'submit', 'createable-select', 'date-range', 'rich-text-editor', 'toggle'];
+const types = ['text', 'password', 'number', 'date', 'time', 'datetime', 'email', 'url', 'textarea', 'file', 'image', 'radio', 'checkbox', 'select', 'submit', 'createable-select', 'date-range', 'rich-text-editor', 'toggle', 'group'];
 const AForm: FC<IProps> = ({ name, children, values, onSubmit, className, formLoading = false, forwardedRef }) => {
 
     //States
@@ -101,10 +101,20 @@ const AForm: FC<IProps> = ({ name, children, values, onSubmit, className, formLo
             // console.log("NOT AN OBJECT", childrens);
             const child: any = childrens;
             if (child && child.props && child.props.children) {
+                const inputName: string = child.props.name;
                 newChildrens.push({
                     ...child,
                     props: {
                         ...child.props,
+                        ...child.props && child.props.type && child.props.type === 'group' ? {
+                            collectChildRef: (childRef: React.RefObject<any>, fieldName: string) => {
+                                // here *we* have access to inputRefs, so we push every grouped child's ref
+                                if(fieldName !== undefined){
+                                    // console.log("it calles", fieldName, "      ", childRef);
+                                    inputRefs.push({ name: `${fieldName}`, ref: childRef });
+                                }
+                            }, handleChange: handleChange, defaultValue: formData && formData[inputName] ? formData[inputName] : undefined
+                        } : undefined,
                         children: mapChildren(child.props.children, index)
                     }
                 });
@@ -116,6 +126,7 @@ const AForm: FC<IProps> = ({ name, children, values, onSubmit, className, formLo
                     isValidElement(child) ? React.cloneElement(child as React.ReactElement, { key: index, ref: inputRef, handleChange: handleChange, onValidate: handleValidation, removeElement: handleRemove, defaultValue: formData && formData[inputName] ? formData[inputName] : undefined }) : null
                 );
                 inputRefs.push({name: inputName, ref: inputRef});
+                // console.log("this is input ref for ", inputName, "    --    ", inputRef);
             } else {
                 newChildrens.push(child);
             }
@@ -125,10 +136,12 @@ const AForm: FC<IProps> = ({ name, children, values, onSubmit, className, formLo
     
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        // console.log("HandleSubmit called.", inputRefs);
+
         inputRefs.map((input) => {
             const { ref } = input;
-            ref.current?.handleValidation();
+            if (input && input.ref) {
+                ref.current?.handleValidation();
+            }
         });
         
         // console.log("ERRORS: ", tErrors);
