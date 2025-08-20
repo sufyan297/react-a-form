@@ -323,6 +323,7 @@ const AFormInput = forwardRef((props: IProps, ref) => {
                                             inputStyle={inputStyle}
                                             containerClassName={containerClassName}
                                             inputClassName={inputClassName}
+                                            onBlur={onInputBlur}
                                         />
                                         : type == 'date' || type == 'datetime' || type == 'time' ?
                                             <DatePicker
