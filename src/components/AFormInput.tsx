@@ -307,6 +307,7 @@ const AFormInput = forwardRef((props: IProps, ref) => {
                                         name={name}
                                         type={type}
                                         multiple={multiple}
+                                        defaultValue={defaultValue as any}
                                         accept={type === 'image' ? 'image/*' : acceptMime}
                                         onChange={(files) => onInputChange(files)}
                                     />
