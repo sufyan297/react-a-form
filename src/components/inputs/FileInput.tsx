@@ -32,7 +32,10 @@ const FileInput: FC<FileInputProps> = ({ name, multiple, onChange, accept, defau
             const tmpFiles = defaultValue instanceof File ? [defaultValue] : defaultValue
             const newFiles: IFile[] = [];
             map(tmpFiles, (file) => {
-                if (file && file.name) {
+                const tmpFile: any = file;
+                if (tmpFile && tmpFile.name && tmpFile.file instanceof Blob) {
+                    newFiles.push(file as any);
+                } else if (file && file.name) {
                     newFiles.push({
                         file: file,
                         name: file.name,
@@ -52,7 +55,7 @@ const FileInput: FC<FileInputProps> = ({ name, multiple, onChange, accept, defau
         const newFiles: IFile[] = [];
         if (tmpFiles) {
             map(tmpFiles, (file) => {
-                if (file && file.name)  {
+                if (file && file.name && file.type)  {
                     newFiles.push({
                         file: file,
                         name: file.name,
@@ -128,7 +131,7 @@ const FileInput: FC<FileInputProps> = ({ name, multiple, onChange, accept, defau
                                             <div className='flex content-between items-center justify-center '>
                                                 <div className="flex justify-center mx-3 align-center">
                                                     {
-                                                        file.hasPreview ? <img src={file.url} className={`h-16 w-16 rounded-md transition-all object-cover duration-300 hover:scale-125`} /> : fileIcon(24)
+                                                        file && file.hasPreview && file.url && file.url != '' ? <img src={file.url} className={`h-16 w-16 rounded-md transition-all object-cover duration-300 hover:scale-125`} /> : fileIcon(24)
                                                     }
                                                 </div>
                                                 <div>
