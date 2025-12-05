@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FC, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, FC, useEffect, useRef, useState } from 'react';
 import { IFile } from '../../types';
 import { map } from 'lodash';
 
@@ -32,13 +32,15 @@ const FileInput: FC<FileInputProps> = ({ name, multiple, onChange, accept, defau
             const tmpFiles = defaultValue instanceof File ? [defaultValue] : defaultValue
             const newFiles: IFile[] = [];
             map(tmpFiles, (file) => {
-                newFiles.push({
-                    file: file,
-                    name: file.name,
-                    url: file instanceof Blob ? URL.createObjectURL(file) : '',
-                    type: file.type,
-                    hasPreview: file.type.indexOf('image') > -1 ? true : false
-                });
+                if (file && file.name) {
+                    newFiles.push({
+                        file: file,
+                        name: file.name,
+                        url: file instanceof Blob ? URL.createObjectURL(file) : '',
+                        type: file.type,
+                        hasPreview: file.type.indexOf('image') > -1 ? true : false
+                    });
+                }
             });
             setFiles(newFiles);
         }
@@ -50,13 +52,15 @@ const FileInput: FC<FileInputProps> = ({ name, multiple, onChange, accept, defau
         const newFiles: IFile[] = [];
         if (tmpFiles) {
             map(tmpFiles, (file) => {
-                newFiles.push({
-                    file: file,
-                    name: file.name,
-                    url: URL.createObjectURL(file),
-                    type: file.type,
-                    hasPreview: file.type.indexOf('image') > -1 ? true : false
-                })
+                if (file && file.name)  {
+                    newFiles.push({
+                        file: file,
+                        name: file.name,
+                        url: URL.createObjectURL(file),
+                        type: file.type,
+                        hasPreview: file.type.indexOf('image') > -1 ? true : false
+                    })
+                }
             });
             let finalFiles = multiple ? [...files, ...newFiles] : [...newFiles];
             setFiles(finalFiles);

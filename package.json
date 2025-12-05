@@ -1,6 +1,6 @@
 {
   "name": "@ascendtis/react-a-form",
-  "version": "0.0.38",
+  "version": "0.0.39",
   "description": "Ascendtis own's Instant validation AForm component.",
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
@@ -21,7 +21,9 @@
   "license": "ISC",
   "private": false,
   "peerDependencies": {
-    "react": ">=16 <=19"
+    "react": ">=16 <=19",
+    "react-dom": ">=16 <=19",
+    "@types/react": ">=18"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.195",

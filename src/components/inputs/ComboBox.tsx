@@ -1,4 +1,4 @@
-import React, { CSSProperties, FC, useEffect, useState } from 'react';
+import { CSSProperties, FC, useEffect, useState } from 'react';
 import Select, { MultiValue, SingleValue } from 'react-select';
 import AsyncSelect from 'react-select/async';
 import CreatableSelect from 'react-select/creatable';

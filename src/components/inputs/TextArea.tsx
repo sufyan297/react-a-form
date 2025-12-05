@@ -1,4 +1,4 @@
-import React, { CSSProperties, ChangeEvent, FC, FocusEvent } from 'react';
+import { CSSProperties, ChangeEvent, FC, FocusEvent } from 'react';
 interface IProps {
     name: string;
     readonly?: boolean;

@@ -1,4 +1,4 @@
-import React, { ChangeEvent, CSSProperties, FC, FocusEvent, useEffect, useState } from 'react';
+import { ChangeEvent, CSSProperties, FC, FocusEvent, useEffect, useState } from 'react';
 interface ITextInput {
   type: 'text' | 'number' | 'email' | 'password' | 'url';
   name: string;

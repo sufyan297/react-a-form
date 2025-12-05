@@ -1,4 +1,4 @@
-import React, { CSSProperties, ChangeEvent, FC } from 'react';
+import { CSSProperties, ChangeEvent, FC } from 'react';
 
 interface IProps {
     //Props
