@@ -10,10 +10,11 @@ interface IProps {
   onChange: (value: string) => void;
   onBlur?: () => void;
   defaultValue?: string;
+  value?: string;
   hasError: boolean;
 }
 
-const RadioButton: React.FC<IProps> = ({ name, disabled, options, onChange, onBlur, defaultValue, hasError, labelPosition, inline }) => {
+const RadioButton: React.FC<IProps> = ({ name, disabled, options, onChange, onBlur, defaultValue, value, hasError, labelPosition, inline }) => {
 
   const handleOnChange = (e: ChangeEvent<HTMLInputElement>) => {
     onChange ? onChange(e.target.value) : null;
@@ -48,12 +49,11 @@ const RadioButton: React.FC<IProps> = ({ name, disabled, options, onChange, onBl
                   disabled={disabled}
                   key={index}
                   onChange={handleOnChange}
-                  defaultValue={defaultValue}
                   name={name}
                   type={'radio'}
                   value={item.value}
                   onBlur={handleBlur}
-                  defaultChecked={item.value == defaultValue ? true : false}
+                  checked={item.value == (value ?? defaultValue) ? true : false}
                 />
                 {labelPosition != 'prefix' ? (
                   <p

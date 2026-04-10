@@ -4,11 +4,12 @@ interface IProps {
   containerClassName?: string;
   inputClassName?: string;
   defaultValue?: boolean;
+  value?: boolean;
   label?: string | React.ReactNode;
   name: string;
   disabled?: boolean;
 }
-const Checkbox: FC<IProps> = ({ onChange, inputClassName, containerClassName, disabled, defaultValue, label, name }) => {
+const Checkbox: FC<IProps> = ({ onChange, inputClassName, containerClassName, disabled, defaultValue, value, label, name }) => {
   return (
     <div className={`flex ${containerClassName}`}>
       <div className={`w-5 h-5 pt-0.5 ${inputClassName ? inputClassName : ''}`}>
@@ -17,7 +18,7 @@ const Checkbox: FC<IProps> = ({ onChange, inputClassName, containerClassName, di
           className={`h-5 w-5 rounded-md accent-primary`}
           type={'checkbox'}
           disabled={disabled}
-          checked={defaultValue}
+          checked={value ?? defaultValue ?? false}
           name={name}
           onChange={() => (onChange ? onChange() : null)}
         />

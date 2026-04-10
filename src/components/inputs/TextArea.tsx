@@ -7,6 +7,7 @@ interface IProps {
     onChange?: (value: string) => void;
     onBlur?: (value: string) => void;
     defaultValue?: string;
+    value?: string;
     hasError: boolean;
 
     //Style
@@ -15,7 +16,7 @@ interface IProps {
     containerClassName?: string;
     inputClassName?: string;
 }
-const TextArea: FC<IProps> = ({ name, placeholder, readonly, disabled, inputClassName, containerClassName, inputStyle, onChange, onBlur, defaultValue, hasError }) => {
+const TextArea: FC<IProps> = ({ name, placeholder, readonly, disabled, inputClassName, containerClassName, inputStyle, onChange, onBlur, defaultValue, value, hasError }) => {
     const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
         onChange ? onChange(e.target.value) : null;
     }
@@ -28,7 +29,7 @@ const TextArea: FC<IProps> = ({ name, placeholder, readonly, disabled, inputClas
                 className={`focus:outline-none block flex-1 border-0 bg-transparent py-1.5 pl-3 text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6 rounded-md ring-1 ring-inset focus-within:ring-2 focus-within:ring-inset ${hasError ? 'ring-red-700 focus-within:ring-red-700' : 'ring-gray-300 hover:ring-primary focus-within:ring-primary'} ${inputClassName ? inputClassName : ''}`}
                 style={inputStyle}
                 name={name}
-                defaultValue={defaultValue}
+                value={value ?? defaultValue ?? ''}
                 placeholder={placeholder}
                 disabled={disabled}
                 readOnly={readonly}

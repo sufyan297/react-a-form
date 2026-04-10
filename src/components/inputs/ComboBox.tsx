@@ -14,6 +14,7 @@ interface IProps {
     onChange?: (value: any) => void;
     onBlur?: () => void;
     defaultValue?: any; //ISelect | ISelect[]
+    value?: any;
     hasError: boolean;
     loading?: boolean;
     containerStyle?: CSSProperties;
@@ -22,18 +23,19 @@ interface IProps {
     onSearch?: (text: string) => Promise<ISelect[]>;
     isCreatable?: boolean;
 }
-const ComboBox: FC<IProps> = ({ onChange, onBlur, disabled, hasError, name, options, multiple, loading, defaultValue, placeholder, containerStyle, inputStyle, onSearch, isCreatable }) => {
+const ComboBox: FC<IProps> = ({ onChange, onBlur, disabled, hasError, name, options, multiple, loading, defaultValue, value, placeholder, containerStyle, inputStyle, onSearch, isCreatable }) => {
     
-    const [ newValue, setNewValue ] = useState<ISelect | null | undefined>(defaultValue);
+    const resolvedValue = value !== undefined ? value : defaultValue;
+    const [ newValue, setNewValue ] = useState<any>(resolvedValue);
     useEffect(() => {
-        if (defaultValue != newValue && onSearch) {
-            setNewValue(defaultValue);
+        if (resolvedValue !== newValue) {
+            setNewValue(resolvedValue);
         }
-    }, [defaultValue]);
+    }, [resolvedValue, newValue]);
 
     //Methods
     const handleChange = (item: SingleValue<ISelect> | MultiValue<ISelect>) => {
-        console.log("SELECTED ITEM: ", item);
+        setNewValue(item);
         onChange ? onChange(item) : null;
     }
     const handleBlur = () => {
@@ -88,6 +90,7 @@ const ComboBox: FC<IProps> = ({ onChange, onBlur, disabled, hasError, name, opti
             onBlur={handleBlur}
             isLoading={loading}
             defaultValue={defaultValue}
+            value={newValue}
             placeholder={placeholder}
             isDisabled={disabled}
             closeMenuOnSelect={multiple ? false : true}

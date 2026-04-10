@@ -1,5 +1,5 @@
-import React, { FC, isValidElement, useEffect, useState, FormEvent, ReactElement, JSXElementConstructor } from 'react';
-import { get, map } from 'lodash';
+import React, { FC, FormEvent, JSXElementConstructor, ReactElement, isValidElement, useCallback, useEffect, useRef, useState } from 'react';
+import { get, isEqual, map } from 'lodash';
 
 interface IProps {
     name?: string;
@@ -21,70 +21,95 @@ const AForm: FC<IProps> = ({ name, children, values, onSubmit, className, formLo
 
     //States
     const [ formData, setFormData ] = useState<any>({ ...values });
-    const [ errors, setErrors ] = useState<any>({});
-    const [ refreshKey, setRefreshKey ] = useState(0);
+    const setErrors = useState<any>({})[1];
+    const inputRefs = useRef<Record<string, React.RefObject<any>>>({});
+    const errorsRef = useRef<any>({});
+    const appliedValuesRef = useRef<any>(values ? { ...values } : undefined);
 
     useEffect(() => {
-        if (!formLoading) { //if FormLoading is used and when it is False
-            setFormData({...values});
+        if (formLoading || !values) {
+            return;
         }
-    }, [formLoading]);
-
-    useEffect(() => {
-        if (values) {
-            setFormData({...formData, ...values});
-            setErrors({});
-            setRefreshKey((prev) => prev + 1);
-            // console.log("NEW VALUES ARRIVED: ", values);
+        const hasMeaningfulValueChange = !isEqual(appliedValuesRef.current, values);
+        if (!hasMeaningfulValueChange) {
+            return;
         }
-    }, [values]);
+        appliedValuesRef.current = { ...values };
+        setFormData((prev: any) => ({ ...prev, ...values }));
+        setErrors({});
+        errorsRef.current = {};
+    }, [formLoading, values]);
 
     // Expose the internal state through the ref
     useEffect(() => {
         if (forwardedRef) {
             forwardedRef.current = {
                 getFormData: () => formData,
-                setFormData: (newValues: any) => setFormData(newValues),
+                setFormData: (newValues: any) => {
+                    appliedValuesRef.current = {
+                        ...(appliedValuesRef.current || {}),
+                        ...newValues
+                    };
+                    setFormData((prev: any) => ({ ...prev, ...newValues }));
+                },
             };
         }
     }, [formData, forwardedRef]);
 
-    let tErrors: {[key: string]: any} = {};
-
     //Methods
-    const handleChange = (name: string, value: string) => {
-        // console.log("NAME: ", name);
-        // console.log("VALUE: ", value)
-        let tmpFormData = {
-            ...formData,
+    const handleChange = useCallback((name: string, value: any) => {
+        setFormData((prev: any) => ({
+            ...prev,
             [name]: value
-        };
-        setFormData(tmpFormData);
-    }
+        }));
+    }, []);
 
-    const handleValidation = (name: string, newErrors: string[]) => {
-        // console.log("VALIDATION : ", name, newErrors);
-        const tmpErrors = {
-            ...errors,
-            [name]: newErrors
-        }
-        tErrors = {...errors, [name]: newErrors};
-        setErrors(tmpErrors);
-    }
+    const handleValidation = useCallback((name: string, newErrors: string[]) => {
+        setErrors((prev: any) => {
+            const prevErrors = prev?.[name] ?? [];
+            const hasSameErrors =
+                prevErrors.length === newErrors.length &&
+                prevErrors.every((error: string, index: number) => error === newErrors[index]);
 
-    const handleRemove = (name: string) => {
-        const tmpErrors = {
-            ...errors,
-            [name]: []
-        }
-        setErrors(tmpErrors);
-        const inputIndex = inputRefs.findIndex((input) => input.name == name);
-        inputRefs.splice(inputIndex, 1); //remove reference
-    }
+            if (hasSameErrors) {
+                return prev;
+            }
+            const tmpErrors = {
+                ...prev,
+                [name]: newErrors
+            };
+            errorsRef.current = tmpErrors;
+            return tmpErrors;
+        });
+    }, []);
+
+    const handleRemove = useCallback((name: string) => {
+        setErrors((prev: any) => {
+            const prevErrors = prev?.[name] ?? [];
+            if (prevErrors.length === 0) {
+                return prev;
+            }
+            const tmpErrors = {
+                ...prev,
+                [name]: []
+            };
+            errorsRef.current = tmpErrors;
+            return tmpErrors;
+        });
+        delete inputRefs.current[name];
+    }, []);
 
     //Constants
     const arrChildren = Array.isArray(children) ? children : [children];
-    const inputRefs: any[] = [];
+
+    const getInputRef = (fieldKey: string) => {
+        if (!inputRefs.current[fieldKey]) {
+            inputRefs.current[fieldKey] = React.createRef();
+        }
+        return inputRefs.current[fieldKey];
+    };
+
+    const hasFieldValue = (fieldName: string) => Object.prototype.hasOwnProperty.call(formData || {}, fieldName);
 
     const mapChildren = (childrens: React.ReactNode | React.ReactNode[], index?: number) => {
         const newChildrens: React.ReactNode[] = [];
@@ -102,31 +127,34 @@ const AForm: FC<IProps> = ({ name, children, values, onSubmit, className, formLo
             const child: any = childrens;
             if (child && child.props && child.props.children) {
                 const inputName: string = child.props.name;
-                newChildrens.push({
-                    ...child,
-                    props: {
-                        ...child.props,
-                        ...child.props && child.props.type && child.props.type === 'group' ? {
-                            collectChildRef: (childRef: React.RefObject<any>, fieldName: string) => {
-                                // here *we* have access to inputRefs, so we push every grouped child's ref
-                                if(fieldName !== undefined){
-                                    // console.log("it calles", fieldName, "      ", childRef);
-                                    inputRefs.push({ name: `${fieldName}`, ref: childRef });
-                                }
-                            }, handleChange: handleChange, defaultValue: formData && formData[inputName] ? formData[inputName] : undefined
-                        } : undefined,
-                        children: mapChildren(child.props.children, index)
-                    }
-                });
-            } else if (child && child.props && child.props.name && child.props.type && types.includes(child.props.type)) {
-                // console.log("FInal object", child)
-                const inputName: string = child.props.name;
-                const inputRef = React.createRef();
+                const isGroupInput = child.props && (child.props as any).type === 'group';
                 newChildrens.push(
-                    isValidElement(child) ? React.cloneElement(child as React.ReactElement, { key: index, ref: inputRef, handleChange: handleChange, onValidate: handleValidation, removeElement: handleRemove, defaultValue: formData && formData[inputName] ? formData[inputName] : undefined }) : null
+                    isValidElement(child) ? React.cloneElement(child as React.ReactElement, {
+                        ...child.props,
+                        ...isGroupInput ? {
+                            collectChildRef: (childRef: React.RefObject<any>, fieldName: string) => {
+                                if(fieldName !== undefined){
+                                    inputRefs.current[fieldName] = childRef;
+                                }
+                            }, handleChange: handleChange, defaultValue: hasFieldValue(inputName) ? formData[inputName] : undefined
+                        } : undefined,
+                        children: isGroupInput ? (child.props as any).children : mapChildren((child.props as any).children, index)
+                    }) : child
                 );
-                inputRefs.push({name: inputName, ref: inputRef});
-                // console.log("this is input ref for ", inputName, "    --    ", inputRef);
+            } else if (child && child.props && child.props.name && child.props.type && types.includes(child.props.type)) {
+                const inputName: string = child.props.name;
+                const fieldKey = child.props.uniqueId ? `${inputName}-${child.props.uniqueId}` : inputName;
+                const inputRef = getInputRef(fieldKey);
+                newChildrens.push(
+                    isValidElement(child) ? React.cloneElement(child as React.ReactElement, {
+                        key: index,
+                        ref: inputRef,
+                        handleChange: handleChange,
+                        onValidate: handleValidation,
+                        removeElement: handleRemove,
+                        defaultValue: hasFieldValue(inputName) ? formData[inputName] : undefined
+                    }) : null
+                );
             } else {
                 newChildrens.push(child);
             }
@@ -137,25 +165,22 @@ const AForm: FC<IProps> = ({ name, children, values, onSubmit, className, formLo
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        inputRefs.map((input) => {
-            const { ref } = input;
-            if (input && input.ref) {
-                ref.current?.handleValidation();
+        const nextErrors: Record<string, string[]> = {};
+        Object.entries(inputRefs.current).forEach(([fieldName, ref]) => {
+            const fieldErrors = ref.current?.handleValidation?.() ?? [];
+            nextErrors[fieldName] = fieldErrors;
+        });
+        errorsRef.current = nextErrors;
+        setErrors(nextErrors);
+        let hasErrors = false;
+        map(nextErrors, (error: any) => {
+            if (get(error, 'length', 0) > 0) {
+                hasErrors = true;
             }
         });
-        
-        // console.log("ERRORS: ", tErrors);
-        setTimeout(() => {
-            let hasErrors = false;
-            map(tErrors, (error: any) => {//errors
-                if (get(error, 'length', 0) > 0) {
-                    hasErrors = true;
-                }
-            });
-            if (!hasErrors) {
-                onSubmit ? onSubmit(formData) : null;
-            }
-        }, 250)
+        if (!hasErrors) {
+            onSubmit ? onSubmit(formData) : null;
+        }
     }
 
     return (
@@ -169,7 +194,7 @@ const AForm: FC<IProps> = ({ name, children, values, onSubmit, className, formLo
             </div>
         </div>
         :
-        <form key={refreshKey} name={name ? name : 'a-form'} onSubmit={handleSubmit} className={`a-form ` + className}>
+        <form name={name ? name : 'a-form'} onSubmit={handleSubmit} className={`a-form ` + className}>
             {mapChildren(arrChildren)}
             {/* Errors: {JSON.stringify(errors)} */}
             {/* Form Values: {JSON.stringify(formData)} <br/>

@@ -10,6 +10,7 @@ interface ITextInput {
   autocomplete?: boolean;
   maxlength?: number;
   defaultValue?: string;
+  value?: string | number;
   hasError?: boolean;
   // iconPosition?: "prefix" | "postfix";
   icon?: string;
@@ -36,6 +37,7 @@ const TextInput: FC<ITextInput> = ({
   onChange,
   autocomplete,
   defaultValue,
+  value,
   maxlength,
   hasError,
   //   icon,
@@ -47,13 +49,14 @@ const TextInput: FC<ITextInput> = ({
   const [iPlaceholder, setIPlaceholder] = useState(placeholder);
   const [iValue, setIValue] = useState('');
   const [isVisiblePassword, setVisiblePassword] = useState<boolean>(false);
+  const resolvedValue = value ?? defaultValue ?? '';
 
   useEffect(() => {
-    if (maskPlaceholder && maskFormat && defaultValue) {
-      const newValue = doPlaceholderMasking(defaultValue, maskFormat, maskPlaceholder);
+    if (maskPlaceholder && maskFormat && resolvedValue) {
+      const newValue = doPlaceholderMasking(String(resolvedValue), maskFormat, maskPlaceholder);
       setIValue(newValue);
     }
-  }, []);
+  }, [maskFormat, maskPlaceholder, resolvedValue]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (maskPlaceholder && maskFormat) {
@@ -149,8 +152,7 @@ ${styles["text-input"]}
             placeholder={iPlaceholder}
             readOnly={readonly}
             onChange={handleChange}
-            defaultValue={defaultValue}
-            value={maskPlaceholder && maskFormat ? iValue : undefined}
+            value={maskPlaceholder && maskFormat ? iValue : resolvedValue}
             maxLength={maxlength}
             onBlur={handleBlur}
             autoComplete={autocomplete === false ? 'new-password' : ''}

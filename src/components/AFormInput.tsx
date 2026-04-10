@@ -21,6 +21,7 @@ interface IProps {
     validation?: IValidations;
     validationName?: string;
     defaultValue?: string;
+    value?: any;
     disabled?: boolean;
     readOnly?: boolean;
     autocomplete?: boolean;
@@ -69,20 +70,26 @@ const AFormInput = forwardRef((props: IProps, ref) => {
     //Props
     const { name, type, validation, validationName, label, placeholder, defaultValue, disabled, readOnly, autocomplete, acceptMime, inline,
         onValidate, removeElement, handleChange, onChange, onBlur, containerStyle, inputStyle, hint, containerClassName, inputClassName, multiple,
-        loading, options, minDate, maxDate, onSearch, isCreatable, repeatable, children, collectChildRef, addLabel } = props;
+        loading, options, minDate, maxDate, onSearch, isCreatable, repeatable, children, collectChildRef, addLabel, value: controlledValue } = props;
 
     //States
-    const [value, setValue] = useState<any>(defaultValue); //string | undefined - defaultValue : undefined
+    const resolvedValue = controlledValue !== undefined ? controlledValue : defaultValue;
+    const [value, setValue] = useState<any>(resolvedValue);
     const [errors, setErrors] = useState<string[]>([]);
 
     const inputId = props.uniqueId ? `${name}-${props.uniqueId}` : name;
+    const validationKey = props.uniqueId ? `${name}-${props.uniqueId}` : name;
 
     //Effects
     useEffect(() => {
         return () => {
-            removeElement ? removeElement(name) : null; //ask AForm to remove errors and value from state
+            removeElement ? removeElement(validationKey) : null; //ask AForm to remove errors and value from state
         }
-    }, []);
+    }, [removeElement, validationKey]);
+
+    useEffect(() => {
+        setValue(resolvedValue);
+    }, [resolvedValue]);
 
     useEffect(() => {
         if (value) {
@@ -92,15 +99,17 @@ const AFormInput = forwardRef((props: IProps, ref) => {
 
     useEffect(() => {
         if (errors && errors.length > 0) {
-            onValidate ? onValidate(name, errors) : null;
+            onValidate ? onValidate(validationKey, errors) : null;
+        } else if (onValidate) {
+            onValidate(validationKey, []);
         }
-    }, [errors]);
+    }, [errors, onValidate, validationKey]);
 
     useImperativeHandle(
         ref,
         () => ({
             handleValidation() {
-                onValidation();
+                return onValidation();
             }
         }),
     )
@@ -140,6 +149,7 @@ const AFormInput = forwardRef((props: IProps, ref) => {
             errors = [...errors, ...tmpError];
         });
         setErrors(errors);
+        return errors;
     }
 
     //RULES - VALIDATIONS FUNCTIONS
@@ -255,6 +265,7 @@ const AFormInput = forwardRef((props: IProps, ref) => {
                         hasError={errors && errors.length > 0 ? true : false}
                         onChange={(value) => onInputChange(value)}
                         onBlur={onInputBlur}
+                        value={value}
                         defaultValue={defaultValue}
                         placeholder={placeholder}
                         disabled={disabled}
@@ -273,7 +284,7 @@ const AFormInput = forwardRef((props: IProps, ref) => {
                             name={name}
                             label={label}
                             onChange={() => onInputChange(!value)}
-                            defaultValue={value}
+                            value={Boolean(value)}
                             containerClassName={containerClassName}
                         />
                         : type == 'checkbox' ?
@@ -281,7 +292,7 @@ const AFormInput = forwardRef((props: IProps, ref) => {
                                 name={name}
                                 label={label}
                                 onChange={() => onInputChange(!value)}
-                                defaultValue={value}
+                                value={Boolean(value)}
                                 containerClassName={containerClassName}
                                 disabled={disabled}
                                 inputClassName={inputClassName}
@@ -291,6 +302,7 @@ const AFormInput = forwardRef((props: IProps, ref) => {
                                     name={name}
                                     hasError={errors && errors.length > 0 ? true : false}
                                     options={options ?? []}
+                                    value={value}
                                     defaultValue={defaultValue}
                                     disabled={disabled}
                                     containerStyle={containerStyle}
@@ -307,6 +319,7 @@ const AFormInput = forwardRef((props: IProps, ref) => {
                                         name={name}
                                         type={type}
                                         multiple={multiple}
+                                        value={value}
                                         defaultValue={defaultValue as any}
                                         accept={type === 'image' ? 'image/*' : acceptMime}
                                         onChange={(files) => onInputChange(files)}
@@ -316,6 +329,7 @@ const AFormInput = forwardRef((props: IProps, ref) => {
                                             name={name}
                                             hasError={errors && errors.length > 0 ? true : false}
                                             onChange={(value) => onInputChange(value)}
+                                            value={value}
                                             defaultValue={defaultValue}
                                             placeholder={placeholder}
                                             disabled={disabled}
@@ -332,6 +346,7 @@ const AFormInput = forwardRef((props: IProps, ref) => {
                                                 name={name}
                                                 hasError={errors && errors.length > 0 ? true : false}
                                                 onChange={(value) => onInputChange(value)}
+                                                value={value}
                                                 defaultValue={defaultValue}
                                                 disabled={disabled}
                                                 readonly={readOnly}
@@ -343,6 +358,7 @@ const AFormInput = forwardRef((props: IProps, ref) => {
                                                     name={name}
                                                     hasError={errors && errors.length > 0 ? true : false}
                                                     onChange={(value) => onInputChange(value)}
+                                                    value={value}
                                                     defaultValue={defaultValue}
                                                     disabled={disabled}
                                                     options={options ?? []}
@@ -355,6 +371,7 @@ const AFormInput = forwardRef((props: IProps, ref) => {
                                                         repeatable={repeatable}
                                                         children={children}
                                                         onChange={onChange}
+                                                        value={value}
                                                         defaultValue={defaultValue as any}
                                                         handleChange={handleChange as any}
                                                         collectChildRef={collectChildRef}

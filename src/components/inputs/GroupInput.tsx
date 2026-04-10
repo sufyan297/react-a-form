@@ -1,5 +1,7 @@
 import React, {
     ReactElement,
+    useEffect,
+    useRef,
     useState,
 } from 'react';
 import { IFile } from '../../types';
@@ -11,6 +13,7 @@ interface IGroupInputProps {
     onChange?: (val: { [key: string]: any }[]) => void;
     addLabel?: string;
     defaultValue?: any;
+    value?: any;
     handleChange?: (name: string, value: string | string[] | boolean | IFile[] | { [key: string]: any }[] | any) => void;
     collectChildRef?: (ref: React.RefObject<any>, fieldName: string) => void;
     inputClassName?: string;
@@ -23,36 +26,73 @@ const GroupInput: React.FC<IGroupInputProps> = ({
     children,
     onChange,
     defaultValue,
+    value,
     handleChange,
     collectChildRef,
     inputClassName,
     containerClassName,
     addLabel = "+ Add More"
 }) => {
+    const normalizeGroupValues = (inputValue: any) => {
+        if (Array.isArray(inputValue) && inputValue.length > 0) {
+            return inputValue.map((item) => ({ ...(item || {}) }));
+        }
+        if (inputValue) {
+            return [{ ...(inputValue || {}) }];
+        }
+        return [{}];
+    };
 
     if (!children) {
         throw new Error("Please provide children in group");
     }
 
     const normalizedOriginal = Array.isArray(children) ? children : [children];
+    const resolvedValue = value !== undefined ? value : defaultValue;
+    const keySeedRef = useRef(0);
+    const groupValuesRef = useRef<{ [key: string]: any }[]>(normalizeGroupValues(resolvedValue));
+    const createGroupKey = (idx: number) => {
+        keySeedRef.current += 1;
+        return `${idx}-${keySeedRef.current}`;
+    };
 
     const [childKeys, setChildKeys] = useState<string[]>(() => {
-        const groups = defaultValue?.length > 0 ? defaultValue.length : 1;
+        const groups = resolvedValue?.length > 0 ? resolvedValue.length : 1;
         return Array.from({ length: groups }).map(
-            (_, idx) => `${idx}-${Date.now()}-${Math.random()}`
+            (_, idx) => createGroupKey(idx)
         );
     });
 
     const [groupValues, setGroupValues] = useState<{ [key: string]: any }[]>(
-        Array.isArray(defaultValue) && defaultValue.length > 0
-            ? defaultValue
-            : (defaultValue ? [defaultValue] : [{}]) 
+        normalizeGroupValues(resolvedValue)
     );
 
+    useEffect(() => {
+        const nextValues = normalizeGroupValues(resolvedValue);
+        setGroupValues(nextValues);
+        groupValuesRef.current = nextValues;
+        setChildKeys((prev) => {
+            if (prev.length === nextValues.length) {
+                return prev;
+            }
+            if (prev.length > nextValues.length) {
+                return prev.slice(0, nextValues.length);
+            }
+            const appendedKeys = Array.from({ length: nextValues.length - prev.length }).map(
+                (_, idx) => createGroupKey(prev.length + idx)
+            );
+            return [...prev, ...appendedKeys];
+        });
+    }, [resolvedValue]);
+
     const onAddMore = () => {
-        const newKey = `${Date.now()}-${Math.random()}`;
+        const newKey = createGroupKey(childKeys.length);
+        const updatedValues = [...groupValuesRef.current, {}];
         setChildKeys((prev) => [...prev, newKey]);
-        setGroupValues((prev) => [...prev, {}]);
+        groupValuesRef.current = updatedValues;
+        setGroupValues(updatedValues);
+        onChange?.(updatedValues);
+        handleChange?.(name, updatedValues);
     };
 
     const removeGroupAt = (index: number) => {
@@ -61,6 +101,7 @@ const GroupInput: React.FC<IGroupInputProps> = ({
 
         setChildKeys(updatedKeys);
         setGroupValues(updatedValues);
+        groupValuesRef.current = updatedValues;
 
         onChange?.(updatedValues);
         handleChange?.(name, updatedValues);
@@ -68,18 +109,15 @@ const GroupInput: React.FC<IGroupInputProps> = ({
 
 
     const handleGroupChange = (groupIndex: number, fieldName: string, value: any) => {
-
-        setGroupValues((prev) => {
-            const updated = [...prev];
-            updated[groupIndex] = {
-                ...updated[groupIndex],
-                [fieldName]: value,
-            };
-            // onChange?.(updated);
-            const newUpdated = repeatable ? updated : updated[0]
-            handleChange && handleChange(name, newUpdated);
-            return updated;
-        });
+        const updated = [...groupValuesRef.current];
+        updated[groupIndex] = {
+            ...updated[groupIndex],
+            [fieldName]: value,
+        };
+        groupValuesRef.current = updated;
+        setGroupValues(updated);
+        const newUpdated = repeatable ? updated : updated[0];
+        handleChange && handleChange(name, newUpdated);
     };
 
     return (
@@ -89,6 +127,7 @@ const GroupInput: React.FC<IGroupInputProps> = ({
                     {childKeys.length > 1 && repeatable && (
                         <button
                             onClick={() => removeGroupAt(index)}
+                            type="button"
                             className="absolute top-1 right-1 text-gray-400 hover:text-red-600 w-6 h-6 flex items-center justify-center border border-gray-200 rounded-full"
                             aria-label="Remove"
                         >
@@ -115,17 +154,15 @@ const GroupInput: React.FC<IGroupInputProps> = ({
                                 const valueMap = groupValues[index] || {};
 
                                 const props: any = {
-                                    // onChange: (e: any) =>
-                                    //     handleGroupChange(index, e.target.name, e.target.value),
-
                                     onChange: (e: any) => {
                                         const name = e?.target?.name ?? fieldName;
                                         const value = e?.target?.value ?? e;
                                         handleGroupChange(index, name, value);
                                     },
                                     onBlur: () => {
-                                        onChange?.(groupValues);
-                                        const newValues = repeatable ? groupValues : groupValues[0];
+                                        const currentValues = groupValuesRef.current;
+                                        onChange?.(currentValues);
+                                        const newValues = repeatable ? currentValues : currentValues[0];
                                         handleChange?.(name, newValues);
                                     },
                                     uniqueId: `${index}`,
@@ -135,7 +172,7 @@ const GroupInput: React.FC<IGroupInputProps> = ({
                                 const originalRef = (el as any).ref;
                                 props.ref = (instance: any) => {
                                     if (fieldName && instance) {
-                                        collectChildRef?.({ current: instance }, fieldName);
+                                        collectChildRef?.({ current: instance }, `${fieldName}-${index}`);
                                     }
 
                                     // preserve original ref
@@ -147,9 +184,7 @@ const GroupInput: React.FC<IGroupInputProps> = ({
                                 };
 
                                 // passes ref of newly created to the inputRefs
-                                collectChildRef && collectChildRef(originalRef, fieldName);
-
-                                // Inject controlled value if available
+                                // Inject current child value so grouped inputs stay visually in sync
                                 if (fieldName && valueMap[fieldName] !== undefined) {
                                     props.value = valueMap[fieldName];
                                     props.defaultValue = valueMap[fieldName]; // Also fallback for uncontrolled

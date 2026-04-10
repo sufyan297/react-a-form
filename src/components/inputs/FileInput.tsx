@@ -9,6 +9,7 @@ interface FileInputProps {
     onChange?: (files: IFile[]) => void;
     accept?: string;
     defaultValue?: File[];
+    value?: IFile[] | File[];
 }
 
 const fileIcon = (size: number) => 
@@ -21,33 +22,36 @@ const removeIcon = (size: number) =>
   <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
 </svg>;
 
-const FileInput: FC<FileInputProps> = ({ name, multiple, onChange, accept, defaultValue }) => {//type,
+const FileInput: FC<FileInputProps> = ({ name, multiple, onChange, accept, defaultValue, value }) => {//type,
     //States
     const [files, setFiles] = useState<IFile[]>([]);
     const [fileKey, setFileKey] = useState<number>(0);
     const fileInputRef = useRef<HTMLDivElement>(null);
+    const resolvedValue = value !== undefined ? value : defaultValue;
 
     useEffect(() => {
-        if (defaultValue) {
-            const tmpFiles = defaultValue instanceof File ? [defaultValue] : defaultValue
-            const newFiles: IFile[] = [];
-            map(tmpFiles, (file) => {
-                const tmpFile: any = file;
-                if (tmpFile && tmpFile.name && tmpFile.file instanceof Blob) {
-                    newFiles.push(file as any);
-                } else if (file && file.name) {
-                    newFiles.push({
-                        file: file,
-                        name: file.name,
-                        url: file instanceof Blob ? URL.createObjectURL(file) : '',
-                        type: file.type,
-                        hasPreview: file.type.indexOf('image') > -1 ? true : false
-                    });
-                }
-            });
-            setFiles(newFiles);
+        if (!resolvedValue) {
+            setFiles([]);
+            return;
         }
-    }, [defaultValue]);
+        const tmpFiles: any[] = resolvedValue instanceof File ? [resolvedValue] : Array.isArray(resolvedValue) ? resolvedValue : [resolvedValue];
+        const newFiles: IFile[] = [];
+        map(tmpFiles, (file: any) => {
+            const tmpFile: any = file;
+            if (tmpFile && tmpFile.name && tmpFile.file instanceof Blob) {
+                newFiles.push(file as any);
+            } else if (file && file.name) {
+                newFiles.push({
+                    file: file as File,
+                    name: file.name,
+                    url: file instanceof Blob ? URL.createObjectURL(file) : '',
+                    type: file.type,
+                    hasPreview: file.type.indexOf('image') > -1 ? true : false
+                });
+            }
+        });
+        setFiles(newFiles);
+    }, [resolvedValue]);
 
     //Methods
     const onFileInputChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -76,8 +80,8 @@ const FileInput: FC<FileInputProps> = ({ name, multiple, onChange, accept, defau
         const newFiles = [...files]
         newFiles.splice(index, 1);
         setFiles(newFiles);
+        onChange ? onChange(newFiles) : null;
         setFileKey((prev) => prev + 1);
-        console.log(newFiles)
     }
 
     const handleDropEnter = () => {
@@ -141,9 +145,9 @@ const FileInput: FC<FileInputProps> = ({ name, multiple, onChange, accept, defau
                                                 </div>
                                             </div>
 
-                                            <a className="file-remove" onClick={() => onFileRemove(idx)}>
+                                            <button type="button" className="file-remove" onClick={() => onFileRemove(idx)}>
                                                 {removeIcon(18)}
-                                            </a>
+                                            </button>
                                         </div>
                                     </li>
                                 ))
