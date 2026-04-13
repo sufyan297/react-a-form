@@ -88,8 +88,11 @@ const AFormInput = forwardRef((props: IProps, ref) => {
     }, [removeElement, validationKey]);
 
     useEffect(() => {
-        setValue(resolvedValue);
-    }, [resolvedValue]);
+        const hasIncomingValue = controlledValue !== undefined || defaultValue !== undefined;
+        if (hasIncomingValue) {
+            setValue(resolvedValue);
+        }
+    }, [controlledValue, defaultValue, resolvedValue]);
 
     useEffect(() => {
         if (value) {
