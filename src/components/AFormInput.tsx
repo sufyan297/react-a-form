@@ -1,5 +1,5 @@
 import React, { CSSProperties, forwardRef, ReactElement, useEffect, useImperativeHandle, useState } from 'react';
-import { map } from 'lodash';
+import { isEqual, map } from 'lodash';
 
 //Input components
 import TextInput from './inputs/TextInput';
@@ -76,6 +76,7 @@ const AFormInput = forwardRef((props: IProps, ref) => {
     const resolvedValue = controlledValue !== undefined ? controlledValue : defaultValue;
     const [value, setValue] = useState<any>(resolvedValue);
     const [errors, setErrors] = useState<string[]>([]);
+    const [lastRestoredValue, setLastRestoredValue] = useState<any>(resolvedValue);
 
     const inputId = props.uniqueId ? `${name}-${props.uniqueId}` : name;
     const validationKey = props.uniqueId ? `${name}-${props.uniqueId}` : name;
@@ -91,8 +92,15 @@ const AFormInput = forwardRef((props: IProps, ref) => {
         const hasIncomingValue = controlledValue !== undefined || defaultValue !== undefined;
         if (hasIncomingValue) {
             setValue(resolvedValue);
+            setLastRestoredValue(resolvedValue);
+            return;
         }
-    }, [controlledValue, defaultValue, resolvedValue]);
+
+        if (value !== undefined && !isEqual(lastRestoredValue, value)) {
+            handleChange ? handleChange(name, value) : null;
+            setLastRestoredValue(value);
+        }
+    }, [controlledValue, defaultValue, handleChange, lastRestoredValue, name, resolvedValue, value]);
 
     useEffect(() => {
         if (value) {
