@@ -166,12 +166,18 @@ const AForm: FC<IProps> = ({ name, children, values, onSubmit, className, formLo
         e.preventDefault();
 
         const nextErrors: Record<string, string[]> = {};
+        const nextFormData = { ...formData };
         Object.entries(inputRefs.current).forEach(([fieldName, ref]) => {
             const fieldErrors = ref.current?.handleValidation?.() ?? [];
             nextErrors[fieldName] = fieldErrors;
+            const fieldValue = ref.current?.getValue?.();
+            if (fieldValue !== undefined) {
+                nextFormData[fieldName] = fieldValue;
+            }
         });
         errorsRef.current = nextErrors;
         setErrors(nextErrors);
+        setFormData(nextFormData);
         let hasErrors = false;
         map(nextErrors, (error: any) => {
             if (get(error, 'length', 0) > 0) {
@@ -179,7 +185,7 @@ const AForm: FC<IProps> = ({ name, children, values, onSubmit, className, formLo
             }
         });
         if (!hasErrors) {
-            onSubmit ? onSubmit(formData) : null;
+            onSubmit ? onSubmit(nextFormData) : null;
         }
     }
 

@@ -121,8 +121,12 @@ const AFormInput = forwardRef((props: IProps, ref) => {
         () => ({
             handleValidation() {
                 return onValidation();
+            },
+            getValue() {
+                return value;
             }
         }),
+        [value]
     )
 
     //@Methods
